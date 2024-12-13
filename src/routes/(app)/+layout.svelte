@@ -51,7 +51,7 @@
 
 <div class="drawer drawer-open">
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content">
+  <div class="drawer-content flex items-center justify-center">
     {@render children()}
   </div>
   <div class="drawer-side">
@@ -70,7 +70,7 @@
     >
       <div class="flex flex-row justify-between items-center">
         <span class="font-semibold">
-          {shouldShowExtendedContent ? 'My App' : ''}
+          {shouldShowExtendedContent ? 'Promptable' : ''}
         </span>
         <button class="btn btn-ghost btn-square" onclick={() => (isSidebarExpanded = !isSidebarExpanded)}>
           {#if isSidebarExpanded}
@@ -80,12 +80,20 @@
           {/if}
         </button>
       </div>
-      <ul class="flex grow items-center">
+      <ul class="flex flex-col grow justify-center">
         <li>
           <a href="/">
             🏠
             {#if shouldShowExtendedContent}
               Home
+            {/if}
+          </a>
+        </li>
+        <li>
+          <a href="/apiKeys">
+            🔐
+            {#if shouldShowExtendedContent}
+              API Keys
             {/if}
           </a>
         </li>

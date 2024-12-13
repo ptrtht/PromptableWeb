@@ -9,27 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          id: number
+          key: string | null
+          name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          key?: string | null
+          name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          key?: string | null
+          name?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       prompt_logs: {
         Row: {
           created_at: string
           id: number
           input: Json | null
           output: Json | null
-          prompt: Json | null
         }
         Insert: {
           created_at?: string
           id?: number
           input?: Json | null
           output?: Json | null
-          prompt?: Json | null
         }
         Update: {
           created_at?: string
           id?: number
           input?: Json | null
           output?: Json | null
-          prompt?: Json | null
         }
         Relationships: []
       }
