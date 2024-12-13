@@ -13,7 +13,7 @@
     if (emailValid) {
       try {
         emailSent = 'loading';
-        await Users.sendMagicLink(email, new URL(window.location.href));
+        await Users.sendMagicLink(email);
         emailSent = 'success';
       } catch (error) {
         emailSent = 'error';

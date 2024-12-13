@@ -1,15 +1,15 @@
 import { Errors } from './Errors';
-import { supabase } from './init';
+import { CURRENT_URL, supabase } from './init';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 
 export class Users {
-  static async sendMagicLink(email: string, currentUrl: URL) {
+  static async sendMagicLink(email: string) {
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: new URL('/magiclink', currentUrl.href).href,
+        emailRedirectTo: new URL('/magiclink', CURRENT_URL.href).href,
       },
     });
 
