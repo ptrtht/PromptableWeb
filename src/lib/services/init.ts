@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-// import { PUBLIC_SUPA_PUBLIC, PUBLIC_SUPA_URL } from '$env/static/public';
+import { PUBLIC_SUPA_PUBLIC, PUBLIC_SUPA_URL } from '$env/static/public';
 import { browser, dev } from '$app/environment';
 import type { Database } from '../../../database.types';
 
-export const supabase = createClient<Database>('PUBLIC_SUPA_URL', 'PUBLIC_SUPA_PUBLIC');
+export const supabase = createClient<Database>(PUBLIC_SUPA_URL, PUBLIC_SUPA_PUBLIC);
 export const env = dev ? 'dev' : 'prod';
 
 export const CURRENT_URL = new URL(browser ? window.location.href : 'http://localhost:5175');

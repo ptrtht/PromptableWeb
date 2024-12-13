@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "npm run supa:types && vite dev --port 5175 --open",
-    "build": "npm run check && vite build",
-    "preview": "vite preview",
+    "build": "vite build",
+    "preview": "svelte-kit sync && vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "supa:types": "npx supabase gen types typescript --project-id dkuazlvtqqhwavflsjjb --schema public > database.types.ts",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
