@@ -1,8 +1,6 @@
 <script lang="ts">
   import { ApiKeys } from '$lib/services/ApiKeys';
   import type { Tables } from '$lib/services/init';
-  import { key } from '@milkdown/kit/plugin/listener';
-  import { calculateNodePosition } from '@milkdown/kit/prose';
   import { onMount } from 'svelte';
 
   let keyName = $state('');
@@ -38,14 +36,15 @@
         {/if}
 
         {#each keys as key, i}
+          {@const apiKey = key.key}
           <tr>
             <th>{i + 1}</th>
             <td>{key.name}</td>
             <td>{key.created_at}</td>
-            {#if key.key}
+            {#if apiKey}
               <td class="join">
                 <input type="password" class="input" value={key.key} />
-                <button class="btn join-item" onclick={() => navigator.clipboard.writeText(key.key)}> Copy </button>
+                <button class="btn join-item" onclick={() => navigator.clipboard.writeText(apiKey)}> Copy </button>
               </td>
             {:else}
               <td>Not Available</td>
