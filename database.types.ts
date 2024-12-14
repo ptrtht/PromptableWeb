@@ -57,27 +57,6 @@ export type Database = {
         }
         Relationships: []
       }
-      prompt_overrides: {
-        Row: {
-          created_at: string
-          id: number
-          original_prompt: string | null
-          override: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          original_prompt?: string | null
-          override?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          original_prompt?: string | null
-          override?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never

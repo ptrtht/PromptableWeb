@@ -6,6 +6,7 @@
   import { browser } from '$app/environment';
   import { tweened } from 'svelte/motion';
   import { quintOut } from 'svelte/easing';
+  import SidebarNavigationItem from '$lib/components/SidebarNavigationItem.svelte';
   let { children } = $props();
 
   let isSidebarExpanded = $state(browser ? localStorage.getItem('isSidebarExpanded') === 'true' : false);
@@ -81,22 +82,27 @@
         </button>
       </div>
       <ul class="flex flex-col grow justify-center">
-        <li>
-          <a href="/">
+        <SidebarNavigationItem href={'/'} {shouldShowExtendedContent}>
+          {#snippet icon()}
             🏠
-            {#if shouldShowExtendedContent}
-              Home
-            {/if}
-          </a>
-        </li>
-        <li>
-          <a href="/apiKeys">
+          {/snippet}
+          Home
+        </SidebarNavigationItem>
+
+        <SidebarNavigationItem href={'/promptLogs'} {shouldShowExtendedContent}>
+          {#snippet icon()}
+            📃
+          {/snippet}
+          Prompt Logs
+        </SidebarNavigationItem>
+
+        <SidebarNavigationItem href={'/apiKeys'} {shouldShowExtendedContent}>
+          {#snippet icon()}
             🔐
-            {#if shouldShowExtendedContent}
-              API Keys
-            {/if}
-          </a>
-        </li>
+          {/snippet}
+          API Keys
+        </SidebarNavigationItem>
+
         <!-- align this to the bottom -->
       </ul>
       <li class="mt-auto">
