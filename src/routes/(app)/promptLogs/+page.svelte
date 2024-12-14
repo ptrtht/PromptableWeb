@@ -2,7 +2,6 @@
   import { type Json } from '$lib/services/init';
   import { PromptLogs } from '$lib/services/PromptLogs';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   let selectedLogId = $state<number | null>(null);
 
