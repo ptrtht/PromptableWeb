@@ -26,3 +26,10 @@ vite.config.ts.timestamp-*
 .env
 .vscode/*
 .env
+
+*storybook.log
+
+
+# Storybook
+.storybook
+storybook-static/

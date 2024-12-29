@@ -7,6 +7,9 @@
   import { tweened } from 'svelte/motion';
   import { quintOut } from 'svelte/easing';
   import SidebarNavigationItem from '$lib/components/SidebarNavigationItem.svelte';
+  import SunSvg from '$lib/SVG/SunSvg.svelte';
+  import MoonSvg from '$lib/SVG/MoonSvg.svelte';
+  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   let { children } = $props();
 
   let isSidebarExpanded = $state(browser ? localStorage.getItem('isSidebarExpanded') === 'true' : false);
@@ -52,13 +55,13 @@
 
 <div class="drawer drawer-open">
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content flex items-center justify-center">
+  <div class="drawer-content flex items-center justify-center bg-base-200">
     {@render children()}
   </div>
   <div class="drawer-side">
     <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
     <aside
-      class={`menu p-4 min-h-full bg-base-200 text-base-content`}
+      class={`menu p-4 min-h-full bg-base-100 text-base-content`}
       style="width: {$sidebarWidth}rem"
       onmouseenter={() => {
         // console.log('hovered');
@@ -89,11 +92,18 @@
           Home
         </SidebarNavigationItem>
 
+        <SidebarNavigationItem href={'/pipeline'} {shouldShowExtendedContent}>
+          {#snippet icon()}
+            ⚙️
+          {/snippet}
+          Pipelines
+        </SidebarNavigationItem>
+
         <SidebarNavigationItem href={'/promptLogs'} {shouldShowExtendedContent}>
           {#snippet icon()}
             📃
           {/snippet}
-          Prompt Logs
+          Logs
         </SidebarNavigationItem>
 
         <SidebarNavigationItem href={'/apiKeys'} {shouldShowExtendedContent}>
@@ -105,6 +115,9 @@
 
         <!-- align this to the bottom -->
       </ul>
+      <li class={'mt-auto ' + (shouldShowExtendedContent ? '' : 'hidden')}>
+        <ThemeSwitcher />
+      </li>
       <li class="mt-auto">
         <button onclick={() => Users.signOut()}>
           <span class="scale-x-[-1]">
