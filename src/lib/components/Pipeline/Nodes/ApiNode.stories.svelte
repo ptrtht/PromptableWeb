@@ -21,7 +21,7 @@
 
 <!-- More on writing stories with args: https://storybook.js.org/docs/writing-stories/args -->
 <Story name="Primary" />
-
+<!-- 
 <Story name="Open" args={{ open: true }} />
 
 <Story
@@ -40,4 +40,4 @@
       },
     }),
   }}
-/>
+/> -->

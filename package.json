@@ -10,7 +10,8 @@
     "supa:types": "npx supabase gen types typescript --project-id dkuazlvtqqhwavflsjjb --schema public > database.types.ts",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "npx chromatic --project-token=chpt_690b544739ee936 --allow-console-errors --skip"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.3",
