@@ -23,6 +23,7 @@
     "@storybook/svelte": "^8.4.7",
     "@storybook/sveltekit": "^8.4.7",
     "@storybook/test": "^8.4.7",
+    "storybook": "^8.4.7",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-vercel": "^5.5.2",
     "@sveltejs/kit": "^2.9.0",
@@ -39,7 +40,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.1",
-    "storybook": "^8.4.7",
     "monaco-editor": "^0.52.2",
     "openai": "^4.77.0",
     "supabase": "^2.0.0",
