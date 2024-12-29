@@ -31,5 +31,4 @@ vite.config.ts.timestamp-*
 
 
 # Storybook
-.storybook
 storybook-static/
