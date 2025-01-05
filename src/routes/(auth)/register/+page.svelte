@@ -12,13 +12,13 @@
   <div class="grid lg:grid-cols-2 items-center justify-center max-w-6xl">
     <div class="flex flex-col gap-8 p-8">
       <div class="flex flex-col gap-4">
-        <h1 class="scroll-m-20 text-4xl font-semibold tracking-tight ">
-          Start building powerful LLM pipelines today
-        </h1>
+        <h1 class="scroll-m-20 text-4xl font-semibold tracking-tight">Start building powerful LLM pipelines today</h1>
         <div class="text-muted-foreground">Visually build, test and deploy production-ready pipelines</div>
       </div>
       <div class="flex gap-4">
-        <SquareDashedMousePointer />
+        <div class="w-6 flex">
+          <SquareDashedMousePointer />
+        </div>
         <div class="flex flex-col gap-2">
           <h4 class="scroll-m-20 text-xl font-semibold tracking-tight">Connect LLM operations on a visual canvas</h4>
           <p class="leading-7 text-muted-foreground">
@@ -27,7 +27,9 @@
         </div>
       </div>
       <div class="flex gap-4">
-        <TextSearch />
+        <div class="w-6 flex">
+          <TextSearch />
+        </div>
         <div class="flex flex-col gap-2">
           <h4 class="scroll-m-20 text-xl font-semibold tracking-tight">Test and validate before you deploy</h4>
           <p class="leading-7 text-muted-foreground">
@@ -37,7 +39,9 @@
         </div>
       </div>
       <div class="flex gap-4">
-        <ShieldCheck />
+        <div class="w-6 flex">
+          <ShieldCheck />
+        </div>
         <div class="flex flex-col gap-2">
           <h4 class="scroll-m-20 text-xl font-semibold tracking-tight">Ready to run in production</h4>
           <p class="leading-7 text-muted-foreground">
