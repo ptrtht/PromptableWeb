@@ -52,7 +52,7 @@
       </div>
     </div>
     <div class="flex p-8">
-      <Card.Root class="p-8 rounded-xl">
+      <Card.Root class="p-8 rounded-xl min-w-full">
         <Card.Content>
           <div class="flex flex-col gap-4">
             <div class="flex gap-4">
