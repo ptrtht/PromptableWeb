@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { ApiKeys } from '$lib/services/ApiKeys';
-  import type { Tables } from '$lib/services/init';
+  import { ApiKeyStore } from '$lib/services/stores/ApiKeyStore';
+  import type { Tables } from '$lib/services/util/init';
   import { onMount } from 'svelte';
 
   let keyName = $state('');
   let keys = $state<Tables['api_keys']['Row'][]>([]);
 
   const createKey = async () => {
-    await ApiKeys.createKey(keyName);
+    await ApiKeyStore.createKey(keyName);
     window.location.reload();
   };
 
   onMount(async () => {
-    keys = await ApiKeys.getKeys();
+    keys = await ApiKeyStore.getKeys();
   });
 </script>
 

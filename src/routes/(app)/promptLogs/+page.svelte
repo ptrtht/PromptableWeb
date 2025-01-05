@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { type Json } from '$lib/services/init';
-  import { PromptLogs } from '$lib/services/PromptLogs';
+  import { PromptLogsStore } from '$lib/services/stores/PromptLogsStore';
+  import { Json } from '$lib/services/util/init';
   import { onMount } from 'svelte';
 
   let selectedLogId = $state<number | null>(null);
@@ -16,7 +16,7 @@
   >([]);
 
   onMount(async () => {
-    logs = await PromptLogs.getLogs();
+    logs = await PromptLogsStore.getLogs();
   });
 </script>
 
