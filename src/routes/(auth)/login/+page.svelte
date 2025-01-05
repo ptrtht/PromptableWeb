@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { Users } from '$lib/services/Users';
 
   let email = $state<string>('');
@@ -50,4 +50,4 @@
       <div class="underline decoration-2 decoration-error">Error sending email. Please try again.</div>
     {/if}
   </div>
-</div>
+</div> -->
