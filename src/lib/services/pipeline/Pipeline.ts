@@ -1,196 +1,191 @@
+import { PipelineConfigSchema, type PipelineConfig } from '$lib/schemas/PipelineConfig';
 import { z } from 'zod';
-import { ApiNodeSchema, ApiNode } from './ApiNode';
-import { BaseNodeSchema, BaseNode } from './BaseNode';
-
-// Define the schema for a Pipeline (simplified without connections)
-export const PipelineSchema = z.object({
-  nodes: z.array(ApiNodeSchema.or(BaseNodeSchema)),
-  endNodeId: z.string().optional(),
-});
+import { NodeService } from './NodeService';
+import { LoggingService } from './LoggingService';
+import { ExecutionContext } from './context/ExecutionContext';
+import { getNestedValue } from './context/VariableResolver';
 
 export class Pipeline {
-  nodes: Map<string, BaseNode>;
-  endNodeId?: string;
+  // Pattern for context variables like {{context.credentials.openai}}
+  private static readonly CONTEXT_PATTERN = /\{\{context\.([\w]+)\.([\w\-\.]+)\}\}/g;
+  
+  // Pattern for node outputs like {{node1.output.data}}
+  private static readonly NODE_PATTERN = /\{\{([\w\-]+)\.([\w\-.\[\]]+)\}\}/g;
+  
+  constructor(
+    private config: PipelineConfig,
+    private context: ExecutionContext
+  ) {}
 
-  constructor() {
-    this.nodes = new Map();
-    this.endNodeId = undefined;
-  }
-
-  addNode(node: BaseNode): Pipeline {
-    this.nodes.set(node.id, node);
-    return this;
-  }
-
-  getNode<T>(nodeId: string): T {
-    const node = this.nodes.get(nodeId);
-    if (!node) throw new Error(`Node '${nodeId}' not found in the pipeline`);
-    return node as T;
-  }
-
-  // Helper to resolve variable references in a value
-  private resolveVariables(value: any, executedNodes: Map<string, BaseNode>): any {
-    if (typeof value === 'string') {
-      // Match pattern {{nodeId.path.to.value}}
-      const matches = value.match(/{{([\w-]+)\.([\w.]+)}}/g);
-      if (matches) {
-        let resolvedValue = value;
-        for (const match of matches) {
-          const [nodeId, ...pathParts] = match.replace('{{', '').replace('}}', '').split('.');
-
-          const sourceNode = executedNodes.get(nodeId);
-          if (!sourceNode) {
-            throw new Error(`Referenced node '${nodeId}' not found or not yet executed`);
-          }
-
-          // Start from outputs
-          let sourceValue = sourceNode.outputs;
-
-          // Navigate through the path
-          for (const part of pathParts) {
-            if (sourceValue === undefined || sourceValue === null) {
-              throw new Error(`Path '${pathParts.join('.')}' not found in node '${nodeId}' outputs`);
-            }
-            sourceValue = sourceValue[part];
-          }
-
-          if (sourceValue === undefined || sourceValue === null) {
-            throw new Error(`Value at path '${pathParts.join('.')}' in node '${nodeId}' is undefined or null`);
-          }
-
-          // If the entire path resolves to an object or array, use it directly
-          if (typeof sourceValue === 'object') {
-            // If this is the entire string (e.g. "{{node.response}}"), return the object
-            if (value === match) {
-              return sourceValue;
-            }
-            // Otherwise stringify for embedding in the larger string
-            resolvedValue = resolvedValue.replace(match, JSON.stringify(sourceValue));
-          } else {
-            // For primitive values, convert to string
-            resolvedValue = resolvedValue.replace(match, String(sourceValue));
-          }
-        }
-        return resolvedValue;
-      }
-    } else if (typeof value === 'object' && value !== null) {
-      if (Array.isArray(value)) {
-        return value.map((item) => this.resolveVariables(item, executedNodes));
-      }
-      const resolvedObj: { [key: string]: any } = {};
-      for (const [key, val] of Object.entries(value)) {
-        resolvedObj[key] = this.resolveVariables(val, executedNodes);
-      }
-      return resolvedObj;
+  private getNodeValue(path: string): any {
+    const [nodeId, ...pathParts] = path.split('.');
+    
+    const nodeOutput = this.context.getNodeOutput(nodeId);
+    if (!nodeOutput) {
+      throw new Error(`Node ${nodeId} output not found`);
     }
+
+    const value = getNestedValue(nodeOutput, pathParts.join('.'));
+    if (value === undefined) {
+      throw new Error(`Path ${path} not found in node output`);
+    }
+
     return value;
   }
 
-  // Helper method to build the dependency graph
-  private buildDependencyGraph(): Map<string, Set<string>> {
-    const dependencies = new Map<string, Set<string>>();
+  private async resolveVariablesDeep(obj: any): Promise<any> {
+    if (Array.isArray(obj)) {
+      return Promise.all(obj.map(item => this.resolveVariablesDeep(item)));
+    }
 
-    // Initialize dependencies for each node
-    for (const [nodeId, node] of this.nodes.entries()) {
-      dependencies.set(nodeId, new Set<string>());
+    if (obj !== null && typeof obj === 'object') {
+      const resolved: Record<string, any> = {};
+      for (const [key, value] of Object.entries(obj)) {
+        resolved[key] = await this.resolveVariablesDeep(value);
+      }
+      return resolved;
+    }
 
-      // Look for variable references in inputs
-      const inputStr = JSON.stringify(node.inputs);
-      const matches = inputStr.match(/{{([\w-]+)\.([\w.]+)}}/g);
+    if (typeof obj === 'string') {
+      let resolvedString = obj;
 
-      if (matches) {
-        for (const match of matches) {
-          const sourceNodeId = match.replace('{{', '').replace('}}', '').split('.')[0];
-          // Add the source node as a dependency for the current node
-          dependencies.get(nodeId)!.add(sourceNodeId);
+      // First resolve context variables
+      const contextMatches = [...obj.matchAll(Pipeline.CONTEXT_PATTERN)];
+      for (const match of contextMatches) {
+        const [fullMatch, namespace, key] = match;
+        try {
+          const value = await this.context.resolveVariable(namespace, key);
+          resolvedString = resolvedString.replace(fullMatch, value);
+        } catch (error) {
+          LoggingService.error('Context variable resolution failed', { namespace, key, error });
+          throw error;
+        }
+      }
+
+      // Then resolve node output references
+      const nodeMatches = [...resolvedString.matchAll(Pipeline.NODE_PATTERN)];
+      for (const match of nodeMatches) {
+        const [fullMatch, nodeId, path] = match;
+        try {
+          const value = this.getNodeValue(`${nodeId}.${path}`);
+          resolvedString = resolvedString.replace(
+            fullMatch, 
+            typeof value === 'string' ? value : JSON.stringify(value)
+          );
+        } catch (error) {
+          LoggingService.error('Node output resolution failed', { nodeId, path, error });
+          throw error;
+        }
+      }
+
+      return resolvedString;
+    }
+
+    return obj;
+  }
+
+  async execute(): Promise<{ success: boolean; state: any; error?: Error }> {
+    try {
+      for (const nodeId of this.config.executionOrder) {
+        const nodeConfig = this.config.nodes[nodeId];
+        if (!nodeConfig) {
+          throw new Error(`Node ${nodeId} not found in pipeline configuration`);
+        }
+
+        const node = NodeService.getNode(nodeConfig.type);
+        await LoggingService.log('info', `Executing node ${nodeId}`, { type: nodeConfig.type });
+
+        // Resolve variables in config
+        const resolvedConfig = {
+          ...(await this.resolveVariablesDeep(nodeConfig.config)),
+          credentials: nodeConfig.credentials,
+        };
+
+        // Validate input
+        const inputValidation = await node.validateInput(resolvedConfig);
+        if (!inputValidation.success) {
+          await LoggingService.log('error', `Input validation failed for node ${nodeId}`, inputValidation.error);
+          this.context.setNodeState(nodeId, resolvedConfig, null, 'error');
+          throw new Error(`Input validation failed for node ${nodeId}`);
+        }
+
+        // Execute node
+        const result = await node.execute(resolvedConfig);
+        await LoggingService.log('debug', `Node ${nodeId} execution result`, result);
+
+        if (!result.success) {
+          await LoggingService.log('error', `Execution failed for node ${nodeId}, result: `, result);
+          this.context.setNodeState(nodeId, resolvedConfig, null, 'error');
+          throw result.error;
+        }
+
+        // Validate output
+        const outputValidation = await node.validateOutput(result.data);
+        if (!outputValidation.success) {
+          await LoggingService.log('error', `Output validation failed for node ${nodeId}`, outputValidation.error);
+          this.context.setNodeState(nodeId, resolvedConfig, null, 'error');
+          throw new Error(`Output validation failed for node ${nodeId}`);
+        }
+
+        // Store result with input
+        this.context.setNodeState(nodeId, resolvedConfig, result.data);
+        await LoggingService.log('info', `Node ${nodeId} completed`, {
+          input: resolvedConfig,
+          output: result.data,
+        });
+      }
+
+      return {
+        success: true,
+        state: this.context.getAllState(),
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        state: this.context.getAllState(),
+        error,
+      };
+    }
+  }
+
+  static validate(config: unknown): z.SafeParseReturnType<any, PipelineConfig> {
+    const result = PipelineConfigSchema.safeParse(config);
+
+    if (result.success) {
+      // Additional validation:
+      // 1. Check if executionOrder contains all nodes
+      const nodeIds = new Set(Object.keys(result.data.nodes));
+      const orderIds = new Set(result.data.executionOrder);
+
+      if (nodeIds.size !== orderIds.size) {
+        return {
+          success: false,
+          error: new z.ZodError([
+            {
+              code: z.ZodIssueCode.custom,
+              path: ['executionOrder'],
+              message: 'Execution order must contain all and only the configured nodes',
+            },
+          ]),
+        };
+      }
+
+      for (const id of nodeIds) {
+        if (!orderIds.has(id)) {
+          return {
+            success: false,
+            error: new z.ZodError([
+              {
+                code: z.ZodIssueCode.custom,
+                path: ['executionOrder'],
+                message: `Node ${id} is missing from execution order`,
+              },
+            ]),
+          };
         }
       }
     }
 
-    return dependencies;
-  }
-
-  // Topological sort with cycle detection
-  private topologicalSort(dependencies: Map<string, Set<string>>, endNodeId: string): string[] {
-    const visited = new Set<string>();
-    const visiting = new Set<string>();
-    const result: string[] = [];
-
-    const dfs = (nodeId: string) => {
-      if (visited.has(nodeId)) return;
-      if (visiting.has(nodeId)) {
-        throw new Error(`Cycle detected in the pipeline at node '${nodeId}'`);
-      }
-      visiting.add(nodeId);
-
-      const nodeDependencies = dependencies.get(nodeId);
-      if (nodeDependencies) {
-        for (const depNodeId of nodeDependencies) {
-          if (!this.nodes.has(depNodeId)) {
-            throw new Error(`Node '${depNodeId}' not found in the pipeline`);
-          }
-          dfs(depNodeId);
-        }
-      }
-
-      visiting.delete(nodeId);
-      visited.add(nodeId);
-      result.push(nodeId);
-    };
-
-    dfs(endNodeId);
     return result;
-  }
-
-  async execute(endNodeId?: string): Promise<Map<string, BaseNode>> {
-    const targetNodeId = endNodeId || this.endNodeId;
-    if (!targetNodeId) {
-      throw new Error('No end node ID provided for execution');
-    }
-    if (!this.nodes.has(targetNodeId)) {
-      throw new Error(`End node '${targetNodeId}' not found in the pipeline`);
-    }
-
-    const dependencies = this.buildDependencyGraph();
-    const executionOrder = this.topologicalSort(dependencies, targetNodeId);
-    const executedNodes = new Map<string, BaseNode>();
-
-    for (const nodeId of executionOrder) {
-      const node = this.nodes.get(nodeId)!;
-
-      // Resolve variables in inputs before execution
-      const resolvedInputs = this.resolveVariables(node.inputs, executedNodes);
-      node.inputs = resolvedInputs;
-
-      await node.execute();
-      executedNodes.set(nodeId, node);
-    }
-
-    return executedNodes;
-  }
-
-  toJSON() {
-    const nodesArray = Array.from(this.nodes.values()).map((node) => node.toJSON());
-    return {
-      nodes: nodesArray,
-      endNodeId: this.endNodeId,
-    };
-  }
-
-  static fromJSON(json: any): Pipeline {
-    PipelineSchema.parse(json);
-    const pipeline = new Pipeline();
-    pipeline.endNodeId = json.endNodeId;
-
-    for (const nodeData of json.nodes) {
-      let node: BaseNode;
-      if (nodeData.type === 'ApiNode') {
-        node = ApiNode.fromJSON(nodeData);
-      } else {
-        node = BaseNode.fromJSON(nodeData);
-      }
-      pipeline.addNode(node);
-    }
-    return pipeline;
   }
 }

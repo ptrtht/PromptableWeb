@@ -33,7 +33,6 @@ vite.config.ts.timestamp-*
 # Storybook
 storybook-static/
 
-
-example_requests.json
+examples/
 supabaseRLS.md
 todo.md

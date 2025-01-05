@@ -1,8 +1,8 @@
-import { supaAdmin } from '$lib/services/server/init';
+import { supaAdmin } from '$lib/services/util/init.server';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-  if (!event.url.pathname.startsWith('/api/v0/external')) {
+  if (!event.url.pathname.startsWith('/api')) {
     return await resolve(event);
   }
   // get the x-api-key header
@@ -17,7 +17,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   //   if the user exists, set the user in the locals
   //   if the user does not exist, return a 403
   const { data, error } = await supaAdmin.from('api_keys').select().eq('key', apiKey);
-  if (error) {
+  if (error || !data.length) {
     console.error(error);
     return Response.json({ error: 'Unautharized' }, { status: 403 });
   }

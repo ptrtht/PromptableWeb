@@ -33,6 +33,27 @@ export type Database = {
         }
         Relationships: []
       }
+      pipelines: {
+        Row: {
+          created_at: string
+          id: string
+          pipeline: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pipeline: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pipeline?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       prompt_logs: {
         Row: {
           created_at: string
@@ -53,6 +74,33 @@ export type Database = {
           id?: number
           input?: Json | null
           output?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      virtual_keys: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          name: string | null
+          provider: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          name?: string | null
+          provider: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          name?: string | null
+          provider?: string
           user_id?: string | null
         }
         Relationships: []

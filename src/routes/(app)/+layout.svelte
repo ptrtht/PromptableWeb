@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Users } from '../../lib/services/Users';
   import { goto } from '$app/navigation';
   import LogoutSvg from '$lib/SVG/LogoutSvg.svelte';
   import { browser } from '$app/environment';
@@ -10,6 +9,7 @@
   import SunSvg from '$lib/SVG/SunSvg.svelte';
   import MoonSvg from '$lib/SVG/MoonSvg.svelte';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
+  import { UsersStore } from '$lib/services/stores/UsersStore';
   let { children } = $props();
 
   let isSidebarExpanded = $state(browser ? localStorage.getItem('isSidebarExpanded') === 'true' : false);
@@ -42,7 +42,7 @@
 
   //   check if user is logged in
   onMount(async () => {
-    const user = await Users.getCurrentUser();
+    const user = await UsersStore.getCurrentUser();
     if (!user) {
       console.log('User not logged in');
 
@@ -119,7 +119,7 @@
         <ThemeSwitcher />
       </li>
       <li class="mt-auto">
-        <button onclick={() => Users.signOut()}>
+        <button onclick={() => UsersStore.signOut()}>
           <span class="scale-x-[-1]">
             <LogoutSvg />
           </span>
