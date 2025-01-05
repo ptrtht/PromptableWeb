@@ -9,10 +9,10 @@
 </script>
 
 <div class="min-h-screen flex items-center justify-center">
-  <div class="grid lg:grid-cols-2 items-center justify-center max-w-7xl">
+  <div class="grid lg:grid-cols-2 items-center justify-center max-w-6xl">
     <div class="flex flex-col gap-8 p-8">
       <div class="flex flex-col gap-4">
-        <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight ">
+        <h1 class="scroll-m-20 text-4xl font-semibold tracking-tight ">
           Start building powerful LLM pipelines today
         </h1>
         <div class="text-muted-foreground">Visually build, test and deploy production-ready pipelines</div>
