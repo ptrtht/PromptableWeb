@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ApiKeyStore } from '$lib/services/stores/ApiKeyStore';
-  import type { Tables } from '$lib/services/util/init';
+  import type { Tables } from '$lib/services/utils/init';
   import { onMount } from 'svelte';
 
   let keyName = $state('');

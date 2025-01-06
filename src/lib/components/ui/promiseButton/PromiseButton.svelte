@@ -2,13 +2,16 @@
   import type { Snippet } from 'svelte';
   import Button, { buttonVariants } from '../button/button.svelte';
   import PulseSpinner from '../spinners/PulseSpinner.svelte';
+  import { cn } from '$lib/utils';
 
   const {
     children,
     promise,
+    class: className,
     ...restProps
   }: {
     children: Snippet;
+    className?: string;
     promise: () => Promise<any>;
   } & Record<string, any> = $props();
 
@@ -26,9 +29,14 @@
   };
 </script>
 
-<Button {...restProps} class="flex-grow" onclick={async () => await handleClick()} disabled={isPromisePending}>
+<Button
+  {...restProps}
+  class={cn('flex-grow', className)}
+  onclick={async () => await handleClick()}
+  disabled={isPromisePending}
+>
   {#if isPromisePending}
-    <PulseSpinner />
+    <PulseSpinner class={restProps.variant === 'outline' ? '' : 'fill-primary-foreground'} />
   {:else}
     <span>
       {@render children()}

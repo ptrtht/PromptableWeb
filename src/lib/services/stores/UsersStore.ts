@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { toast } from 'svelte-sonner';
 import { LoggingService } from '../pipeline/LoggingService';
-import { CURRENT_URL, supabase } from '../util/init';
+import { CURRENT_URL, supabase } from '../utils/init';
 
 export class UsersStore {
   static async sendMagicLink(email: string) {

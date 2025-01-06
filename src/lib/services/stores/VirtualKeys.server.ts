@@ -1,5 +1,5 @@
 import { LoggingService } from '../pipeline/LoggingService';
-import { supaAdmin } from '../util/init.server';
+import { supaAdmin } from '../utils/init.server';
 
 export class VirtualKeyServerStore {
   static async getKey({

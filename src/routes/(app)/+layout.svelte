@@ -1,6 +1,11 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import * as Collapsible from '$lib/components/ui/collapsible';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+  import FeedbackModal from '$lib/components/ui/feedback-modal/FeedbackModal.svelte';
+  import Navbar from '$lib/components/ui/navbar/Navbar.svelte';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import Paragraph from '$lib/components/ui/text/Paragraph.svelte';
   import { UsersStore } from '$lib/services/stores/UsersStore';
@@ -12,11 +17,13 @@
     KeySquare,
     LayoutGrid,
     LifeBuoy,
+    Network,
     Send,
     SquareTerminal,
   } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
+  import { cn } from 'tailwind-variants';
 
   let { children } = $props();
 
@@ -28,13 +35,19 @@
       goto('/login');
     }
   });
+
+  let currentPath = $state(browser ? window.location.pathname : '');
+  page.subscribe((value) => {
+    console.log('currentPath', value.url.pathname);
+    currentPath = value.url.pathname;
+  });
 </script>
 
 <Sidebar.Provider>
-  <Sidebar.Root>
+  <Sidebar.Root collapsible="icon">
     <Sidebar.Header>
       <Sidebar.Menu>
-        <Sidebar.MenuItem>
+        <Sidebar.MenuItem class="group-data-[collapsible=icon]:hidden">
           <DropdownMenu.Root>
             <DropdownMenu.Trigger>
               {#snippet child({ props })}
@@ -58,64 +71,95 @@
           </DropdownMenu.Root>
         </Sidebar.MenuItem>
       </Sidebar.Menu>
-      <Sidebar.MenuButton>
-        <House />
-        <a href="#"> Home </a>
+      <Sidebar.MenuButton isActive={currentPath === '/'}>
+        {#snippet child({ props })}
+          <a href="/" {...props}>
+            <House />
+            Home
+          </a>
+        {/snippet}
       </Sidebar.MenuButton>
     </Sidebar.Header>
 
     <Sidebar.Content>
+      <Collapsible.Root open class="group/collapsible">
+        <Sidebar.Group>
+          <Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
+          <Sidebar.GroupContent>
+            <Sidebar.Menu>
+              <Sidebar.MenuItem>
+                <Sidebar.MenuButton isActive={currentPath.includes('/pipelines')}>
+                  {#snippet child({ props })}
+                    <a href="/pipelines" {...props}>
+                      <SquareTerminal />
+                      Pipelines
+                    </a>
+                  {/snippet}
+                </Sidebar.MenuButton>
+              </Sidebar.MenuItem>
+              <Sidebar.MenuItem>
+                <Sidebar.MenuButton>
+                  <BookOpen />
+                  <a href="#"> Documentation </a>
+                </Sidebar.MenuButton>
+              </Sidebar.MenuItem>
+            </Sidebar.Menu>
+          </Sidebar.GroupContent>
+        </Sidebar.Group>
+      </Collapsible.Root>
       <Sidebar.Group>
-        <Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
-        <Sidebar.GroupContent>
-          <Sidebar.Menu>
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton>
-                <SquareTerminal />
-                <a href="#"> Pipelines </a>
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton>
-                <BookOpen />
-                <a href="#"> Documentation </a>
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-          </Sidebar.Menu>
-        </Sidebar.GroupContent>
-      </Sidebar.Group>
-      <Sidebar.Group>
-        <Sidebar.GroupLabel>Settings</Sidebar.GroupLabel>
-        <Sidebar.GroupContent>
-          <Sidebar.Menu>
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton>
-                <KeyRound />
-                <a href="#"> API Keys </a>
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton>
-                <KeySquare />
-                <a href="#"> Virtual Keys </a>
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton>
-                <LayoutGrid />
-                <a href="#"> Account </a>
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-          </Sidebar.Menu>
-        </Sidebar.GroupContent>
+        <Collapsible.Root open class="group/collapsible">
+          <Sidebar.Group>
+            <Sidebar.GroupLabel>
+              {#snippet child({ props })}
+                <Collapsible.Trigger {...props}>
+                  Settings
+                  <ChevronDown class="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                </Collapsible.Trigger>
+              {/snippet}
+            </Sidebar.GroupLabel>
+          </Sidebar.Group>
+          <Collapsible.Content>
+            <Sidebar.GroupContent>
+              <Sidebar.Menu>
+                <Sidebar.MenuItem>
+                  <Sidebar.MenuButton isActive={currentPath === '/api-keys'}>
+                    {#snippet child({ props })}
+                      <a href="/api-keys" {...props}>
+                        <KeyRound />
+                        API Keys
+                      </a>
+                    {/snippet}
+                  </Sidebar.MenuButton>
+                </Sidebar.MenuItem>
+                <Sidebar.MenuItem>
+                  <Sidebar.MenuButton>
+                    <Network />
+                    <a href="#"> Providers </a>
+                  </Sidebar.MenuButton>
+                </Sidebar.MenuItem>
+                <Sidebar.MenuItem>
+                  <Sidebar.MenuButton>
+                    <LayoutGrid />
+                    <a href="#"> Account </a>
+                  </Sidebar.MenuButton>
+                </Sidebar.MenuItem>
+              </Sidebar.Menu>
+            </Sidebar.GroupContent>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </Sidebar.Group>
     </Sidebar.Content>
     <Sidebar.Footer>
       <Sidebar.Menu>
         <Sidebar.MenuItem>
           <Sidebar.MenuButton>
-            <Send />
-            <a href="#"> Feedback </a>
+            {#snippet child({ props })}
+              <FeedbackModal {...props}>
+                <Send />
+                <span> Feedback </span>
+              </FeedbackModal>
+            {/snippet}
           </Sidebar.MenuButton>
           <Sidebar.MenuButton>
             <LifeBuoy />
@@ -125,8 +169,7 @@
       </Sidebar.Menu>
     </Sidebar.Footer>
   </Sidebar.Root>
-  <main>
-    <Sidebar.Trigger />
+  <main class="flex flex-col min-h-screen w-full text-foreground">
     {@render children?.()}
   </main>
 </Sidebar.Provider>

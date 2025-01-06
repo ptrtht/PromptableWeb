@@ -1,5 +1,5 @@
 import { LoggingService } from '../pipeline/LoggingService';
-import { supaAdmin } from '../util/init.server';
+import { supaAdmin } from '../utils/init.server';
 import { PipelineStore } from './PipelineStore';
 
 export class PipelineServerStore extends PipelineStore {

@@ -1,8 +1,8 @@
-import { supaAdmin } from '$lib/services/util/init.server';
+import { supaAdmin } from '$lib/services/utils/init.server';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-  if (!event.url.pathname.startsWith('/api')) {
+  if (!event.url.pathname.startsWith('/api/v0/')) {
     return await resolve(event);
   }
   // get the x-api-key header

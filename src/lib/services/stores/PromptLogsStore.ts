@@ -1,5 +1,5 @@
 import { LoggingService } from '../pipeline/LoggingService';
-import { supabase } from '../util/init';
+import { supabase } from '../utils/init';
 import { UsersStore } from './UsersStore';
 
 export class PromptLogsStore {

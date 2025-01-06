@@ -44,7 +44,9 @@
     "vite": "^6.0.0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.47.1",
+    "@notionhq/client": "^2.2.15",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
     "monaco-editor": "^0.52.2",
     "openai": "^4.77.0",
     "supabase": "^2.0.0",
