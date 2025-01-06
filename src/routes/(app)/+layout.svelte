@@ -16,6 +16,7 @@
     SquareTerminal,
   } from 'lucide-svelte';
   import { onMount } from 'svelte';
+  import { toast } from 'svelte-sonner';
 
   let { children } = $props();
 
@@ -23,6 +24,7 @@
     try {
       await UsersStore.getCurrentUser();
     } catch (error) {
+      toast.warning('You need to sign in to access this page');
       goto('/login');
     }
   });
