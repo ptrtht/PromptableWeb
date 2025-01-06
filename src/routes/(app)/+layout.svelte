@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import Paragraph from '$lib/components/ui/text/Paragraph.svelte';
@@ -14,8 +15,17 @@
     Send,
     SquareTerminal,
   } from 'lucide-svelte';
+  import { onMount } from 'svelte';
 
   let { children } = $props();
+
+  onMount(async () => {
+    try {
+      await UsersStore.getCurrentUser();
+    } catch (error) {
+      goto('/login');
+    }
+  });
 </script>
 
 <Sidebar.Provider>
