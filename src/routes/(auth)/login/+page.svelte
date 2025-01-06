@@ -22,10 +22,15 @@
     if (!userdata.email.value) {
       userdata.email.error = 'Email is required';
       errors = true;
+    } else {
+      userdata.email.error = '';
     }
+
     if (!userdata.password.value || userdata.password.value.length < 8) {
       userdata.password.error = 'Password is required';
       errors = true;
+    } else {
+      userdata.password.error = '';
     }
 
     if (errors) {
@@ -81,7 +86,9 @@
               class={userdata.password.error ? 'border-destructive' : ''}
               bind:value={userdata.password.value}
             />
-            <Paragraph variant={userdata.password.error ? 'error' : 'muted'} size="sm">Minimum 8 characters.</Paragraph>
+            {#if userdata.password.error}
+              <Paragraph variant="error" size="sm">Minimum 8 characters.</Paragraph>
+            {/if}
           </div>
 
           <PromiseButton promise={onLogin}>Continue</PromiseButton>

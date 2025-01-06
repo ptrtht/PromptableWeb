@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
+import { toast } from 'svelte-sonner';
 import { LoggingService } from '../pipeline/LoggingService';
 import { CURRENT_URL, supabase } from '../util/init';
 
@@ -14,7 +15,8 @@ export class UsersStore {
     });
 
     if (error) {
-      // throw Errors.error(error);
+      toast.error('Error sending magic link');
+      throw LoggingService.error('Error sending magic link', error);
     }
   }
 
@@ -27,6 +29,7 @@ export class UsersStore {
     });
 
     if (error) {
+      toast.error('Error signing in with Google');
       throw LoggingService.error('Error signing in with Google', error);
     }
 
@@ -42,6 +45,7 @@ export class UsersStore {
     });
 
     if (error) {
+      toast.error('Error signing in with Github');
       throw LoggingService.error('Error signing in with Github', error);
     }
 
@@ -55,6 +59,7 @@ export class UsersStore {
     });
 
     if (error) {
+      toast.error('Invalid email or password');
       throw LoggingService.error('Error signing in with email and password', error);
     }
 
@@ -69,6 +74,7 @@ export class UsersStore {
     });
 
     if (error) {
+      toast.error('Error signing up with email and password');
       throw LoggingService.error('Error signing up with email and password', error);
     }
 
