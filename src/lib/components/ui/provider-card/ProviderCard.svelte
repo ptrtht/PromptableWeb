@@ -19,7 +19,6 @@
   import { LoggingService } from '$lib/services/pipeline/LoggingService';
   import PulseSpinner from '../spinners/PulseSpinner.svelte';
   import { Badge } from '../badge';
-  import { key } from '@milkdown/kit/plugin/listener';
 
   const {
     provider,

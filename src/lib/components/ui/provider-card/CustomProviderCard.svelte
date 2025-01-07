@@ -16,10 +16,7 @@
   import { toast } from 'svelte-sonner';
   import { onMount } from 'svelte';
   import { VirtualKeyStore } from '$lib/services/stores/VirtualKeyStore';
-  import { LoggingService } from '$lib/services/pipeline/LoggingService';
-  import PulseSpinner from '../spinners/PulseSpinner.svelte';
   import { Badge } from '../badge';
-  import { key } from '@milkdown/kit/plugin/listener';
 
   const {
     virtualKey,
