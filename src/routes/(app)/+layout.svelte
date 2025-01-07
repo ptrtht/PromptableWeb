@@ -12,6 +12,7 @@
   import {
     BookOpen,
     ChevronDown,
+    FileTerminal,
     House,
     KeyRound,
     KeySquare,
@@ -98,6 +99,16 @@
                 </Sidebar.MenuButton>
               </Sidebar.MenuItem>
               <Sidebar.MenuItem>
+                <Sidebar.MenuButton isActive={currentPath.includes('/pipelines/templates')}>
+                  {#snippet child({ props })}
+                    <a href="/pipelines" {...props}>
+                      <FileTerminal />
+                      Pipeline Templates
+                    </a>
+                  {/snippet}
+                </Sidebar.MenuButton>
+              </Sidebar.MenuItem>
+              <Sidebar.MenuItem>
                 <Sidebar.MenuButton>
                   <BookOpen />
                   <a href="#"> Documentation </a>
@@ -133,9 +144,13 @@
                   </Sidebar.MenuButton>
                 </Sidebar.MenuItem>
                 <Sidebar.MenuItem>
-                  <Sidebar.MenuButton>
-                    <Network />
-                    <a href="#"> Providers </a>
+                  <Sidebar.MenuButton isActive={currentPath === '/providers'}>
+                    {#snippet child({ props })}
+                      <a href="/providers" {...props}>
+                        <Network />
+                        Providers
+                      </a>
+                    {/snippet}
                   </Sidebar.MenuButton>
                 </Sidebar.MenuItem>
                 <Sidebar.MenuItem>

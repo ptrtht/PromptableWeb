@@ -15,6 +15,7 @@ export type Database = {
           id: number
           key: string | null
           name: string | null
+          status: Database["public"]["Enums"]["api_key_status_enum"]
           user_id: string | null
         }
         Insert: {
@@ -22,6 +23,7 @@ export type Database = {
           id?: number
           key?: string | null
           name?: string | null
+          status?: Database["public"]["Enums"]["api_key_status_enum"]
           user_id?: string | null
         }
         Update: {
@@ -29,6 +31,7 @@ export type Database = {
           id?: number
           key?: string | null
           name?: string | null
+          status?: Database["public"]["Enums"]["api_key_status_enum"]
           user_id?: string | null
         }
         Relationships: []
@@ -78,6 +81,33 @@ export type Database = {
         }
         Relationships: []
       }
+      providers: {
+        Row: {
+          created_at: string
+          description: string
+          id: number
+          link: string
+          logo_url: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: number
+          link: string
+          logo_url: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: number
+          link?: string
+          logo_url?: string
+          name?: string
+        }
+        Relationships: []
+      }
       virtual_keys: {
         Row: {
           created_at: string
@@ -85,6 +115,7 @@ export type Database = {
           key: string
           name: string | null
           provider: string
+          status: Database["public"]["Enums"]["api_key_status_enum"]
           user_id: string | null
         }
         Insert: {
@@ -93,6 +124,7 @@ export type Database = {
           key: string
           name?: string | null
           provider: string
+          status?: Database["public"]["Enums"]["api_key_status_enum"]
           user_id?: string | null
         }
         Update: {
@@ -101,19 +133,31 @@ export type Database = {
           key?: string
           name?: string | null
           provider?: string
+          status?: Database["public"]["Enums"]["api_key_status_enum"]
           user_id?: string | null
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      v_orphaned_virtual_keys: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          key: string | null
+          name: string | null
+          provider: string | null
+          status: Database["public"]["Enums"]["api_key_status_enum"] | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      api_key_status_enum: "active" | "revoked" | "deleted"
     }
     CompositeTypes: {
       [_ in never]: never

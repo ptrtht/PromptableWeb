@@ -24,7 +24,8 @@
 <Navbar breadcrumbs={[{ label: 'Home', href: '/' }]} />
 <div class="flex-grow flex flex-col bg-background gap-6 p-6">
   <H1>
-    Hi {user?.user_metadata.preferred_username ?? user?.user_metadata.name ?? 'there'}, what are we building today?
+    Hi {user?.user_metadata.preferred_username ?? user?.user_metadata.user_name ?? user?.user_metadata.name ?? 'there'},
+    what are we building today?
   </H1>
   <div class="flex gap-6 justify-start stretch">
     <Card.Root class="flex-grow min-w-xs">

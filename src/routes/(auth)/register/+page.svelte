@@ -59,6 +59,8 @@
     await UsersStore.signUpWithEmailPassword({
       email: userdata.email.value,
       password: userdata.password.value,
+      name: userdata.name.value,
+      lastName: userdata.lastName.value,
     });
   };
 </script>

@@ -1,7 +1,8 @@
 import { LoggingService } from '../pipeline/LoggingService';
 import { supaAdmin } from '../utils/init.server';
+import { VirtualKeyStore } from './VirtualKeyStore';
 
-export class VirtualKeyServerStore {
+export class VirtualKeyServerStore extends VirtualKeyStore {
   static async getKey({
     user_id,
     virtualKeyId,

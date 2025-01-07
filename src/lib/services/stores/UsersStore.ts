@@ -66,11 +66,26 @@ export class UsersStore {
     if (browser) goto('/callback');
   }
 
-  static async signUpWithEmailPassword({ email, password }: { email: string; password: string }) {
+  static async signUpWithEmailPassword({
+    email,
+    password,
+    name,
+    lastName,
+  }: {
+    email: string;
+    password: string;
+    name: string;
+    lastName: string;
+  }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {},
+      options: {
+        data: {
+          full_name: `${name} ${lastName}`,
+          user_name: name,
+        },
+      },
     });
 
     if (error) {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { VirtualKeyServerStore } from '../stores/VirtualKeys.server';
+import { VirtualKeyServerStore } from '../stores/VirtualKeyStore.server';
 
 const SupportedProviderSchema = z.string();
 

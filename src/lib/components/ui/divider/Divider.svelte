@@ -7,22 +7,24 @@
     children,
     direction = 'horizontal',
     class: className,
+    variant = 'default',
   }: {
     children?: Snippet;
     direction?: 'horizontal' | 'vertical';
     class?: string;
+    variant?: 'default' | 'muted';
   } = $props();
 </script>
 
 {#if direction === 'horizontal'}
   <div class={cn('relative flex items-center', className)}>
-    <div class="flex-grow border-t border-muted-foreground"></div>
+    <div class={cn('flex-grow border-t ', variant === 'default' ? 'border-muted-foreground' : 'border-muted')}></div>
     <Paragraph variant="muted" size="xs" class="flex-shrink leading-none mx-4">
       {#if children}
         {@render children()}
       {/if}
     </Paragraph>
-    <div class="flex-grow border-t border-muted-foreground"></div>
+    <div class={cn('flex-grow border-t ', variant === 'default' ? 'border-muted-foreground' : 'border-muted')}></div>
   </div>
 {:else if direction === 'vertical'}
   <div class={cn('flex h-full items-center', className)}>

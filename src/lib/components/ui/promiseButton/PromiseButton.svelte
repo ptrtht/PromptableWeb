@@ -8,11 +8,13 @@
     children,
     promise,
     class: className,
+    variant = 'default',
     ...restProps
   }: {
     children: Snippet;
     className?: string;
     promise: () => Promise<any>;
+    variant?: keyof (typeof buttonVariants)['variants']['variant'];
   } & Record<string, any> = $props();
 
   let isPromisePending = $state<boolean>(false);
@@ -22,9 +24,12 @@
     console.log('resolving promise');
     try {
       await promise();
+      setTimeout(() => {
+        isPromisePending = false;
+      }, 2000);
     } catch (error) {
-      console.error(error);
       isPromisePending = false;
+      console.error(error);
     }
   };
 </script>
@@ -34,9 +39,18 @@
   class={cn('flex-grow', className)}
   onclick={async () => await handleClick()}
   disabled={isPromisePending}
+  {variant}
 >
   {#if isPromisePending}
-    <PulseSpinner class={restProps.variant === 'outline' ? '' : 'fill-primary-foreground'} />
+    <PulseSpinner
+      class={variant === 'destructive'
+        ? 'fill-destructive'
+        : variant === 'destructive_outline'
+          ? 'fill-destructive'
+          : variant === 'default'
+            ? 'fill-primary-foreground'
+            : ''}
+    />
   {:else}
     <span>
       {@render children()}

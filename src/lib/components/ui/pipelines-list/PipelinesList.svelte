@@ -2,13 +2,15 @@
   import { goto } from '$app/navigation';
   import * as Table from '$lib/components/ui/table/index.js';
   import type { User } from '@supabase/supabase-js';
-  import * as Avatar from '../avatar';
   import { Badge } from '../badge';
   import { Button } from '../button';
   import H4 from '../text/H4.svelte';
   import Paragraph from '../text/Paragraph.svelte';
   import { onMount } from 'svelte';
   import { UsersStore } from '$lib/services/stores/UsersStore';
+  import { CircleUser } from 'lucide-svelte';
+  import { getLocalDateTime } from '$lib/utils/utils';
+  import AvatarUser from '../avatar-user/AvatarUser.svelte';
 
   const {
     maxRows = 9999,
@@ -132,20 +134,11 @@
             <Table.Cell>
               <Paragraph class="">{pipelineStat.error_rate.toFixed(2)}%</Paragraph>
             </Table.Cell>
-            <Table.Cell
-              >{new Date(pipelineStat.last_edited).toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-              })}
+            <Table.Cell>
+              {getLocalDateTime(pipelineStat.last_edited)}
             </Table.Cell>
             <Table.Cell class="font-medium">
-              <Avatar.Root>
-                <Avatar.Image src={user?.user_metadata.avatar_url} alt="@shadcn" />
-                <Avatar.Fallback></Avatar.Fallback>
-              </Avatar.Root>
+              <AvatarUser {user} />
             </Table.Cell>
             <Table.Cell class="text-right">
               <Button variant="outline">Edit</Button>
