@@ -8,6 +8,7 @@
   import { Label } from '$lib/components/ui/label';
   import Navbar from '$lib/components/ui/navbar/Navbar.svelte';
   import PromiseButton from '$lib/components/ui/promiseButton/PromiseButton.svelte';
+  import { Skeleton } from '$lib/components/ui/skeleton';
   import * as Table from '$lib/components/ui/table';
   import H1 from '$lib/components/ui/text/H1.svelte';
   import H4 from '$lib/components/ui/text/H4.svelte';
@@ -22,6 +23,8 @@
   import { toast } from 'svelte-sonner';
 
   let keys = $state<Tables['api_keys']['Row'][]>([]);
+  let keysLoading = $state(true);
+
   let user: User | null = $state(null);
 
   let createModalOpen = $state(false);
@@ -72,14 +75,19 @@
   onMount(async () => {
     keys = await ApiKeyStore.getKeys();
     user = await UsersStore.getCurrentUser();
+
+    keysLoading = false;
   });
 </script>
 
 <Navbar breadcrumbs={[{ label: 'Api Keys', href: '/api-keys' }]} />
 
-<div class="flex flex-col items-center justify-center h-full w-full gap-6 p-6 bg-background">
+<div class="flex flex-col items-center h-full w-full gap-6 p-6 bg-background">
   <div class="flex w-full place-content-between">
-    <H4>API Keys</H4>
+    <div>
+      <H1>API keys</H1>
+      <Paragraph variant="muted">Securely manage API keys for your providers and services</Paragraph>
+    </div>
     <div class="flex gap-3">
       <Button
         variant="default"
@@ -102,63 +110,87 @@
       </Table.Row>
     </Table.Header>
     <Table.Body>
-      {#each keys as key}
-        {#if key.status !== 'deleted'}
-          <Table.Row>
-            <Table.Cell class="max-w-[10rem]">
-              <Paragraph class="truncate">{key.name}</Paragraph>
-            </Table.Cell>
-            <Table.Cell class="max-w-[10rem]">
-              <Badge
-                variant={key.status === 'active' ? 'default' : key.status === 'revoked' ? 'destructive' : 'secondary'}
-              >
-                {key.status}
-              </Badge>
-            </Table.Cell>
-            <Table.Cell class="max-w-[15rem]">
-              <Paragraph class="truncate ">
-                <span class="flex w-full max-w-xs items-center space-x-2">
-                  <!-- allows see the first 5 chars, replace the rest with * -->
-                  <Input type="text" class="password" value={key.key} disabled />
-                  <Button onclick={() => copyKey(key.key)} disabled={key.status !== 'active'}>
-                    <Copy />
-                  </Button>
-                </span>
-              </Paragraph>
-            </Table.Cell>
+      {#if keysLoading}
+        <Table.Row>
+          <Table.Cell colspan={5}>
+            <div class="flex items-center space-x-4">
+              <Skeleton class="h-8 w-full" />
+            </div>
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell colspan={5}>
+            <div class="flex items-center space-x-4">
+              <Skeleton class="h-8 w-full" />
+            </div>
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell colspan={5}>
+            <div class="flex items-center space-x-4">
+              <Skeleton class="h-8 w-full" />
+            </div>
+          </Table.Cell>
+        </Table.Row>
+      {:else}
+        {#each keys as key}
+          {#if key.status !== 'deleted'}
+            <Table.Row>
+              <Table.Cell class="max-w-[10rem]">
+                <Paragraph class="truncate">{key.name}</Paragraph>
+              </Table.Cell>
+              <Table.Cell class="w-[7rem]">
+                <Badge
+                  variant={key.status === 'active' ? 'default' : key.status === 'revoked' ? 'destructive' : 'secondary'}
+                >
+                  {key.status}
+                </Badge>
+              </Table.Cell>
+              <Table.Cell class="max-w-[15rem]">
+                <Paragraph class="truncate ">
+                  <span class="flex w-full max-w-xs items-center space-x-2">
+                    <!-- allows see the first 5 chars, replace the rest with * -->
+                    <Input type="text" class="password" value={key.key} disabled />
+                    <Button onclick={() => copyKey(key.key)} disabled={key.status !== 'active'}>
+                      <Copy />
+                    </Button>
+                  </span>
+                </Paragraph>
+              </Table.Cell>
 
-            <Table.Cell class="max-w-[10rem]">
-              <Paragraph class="truncate ">{getLocalDateTime(key.created_at)}</Paragraph>
-            </Table.Cell>
-            <Table.Cell class="max-w-[5rem]">
-              <Paragraph class="truncate ">
-                <AvatarUser {user} />
-              </Paragraph>
-            </Table.Cell>
-            <Table.Cell class="max-w-[10rem] flex justify-end">
-              {#if key.status === 'active'}
-                <PromiseButton
-                  variant="destructive_outline"
-                  promise={async () => {
-                    revokeKey(key.id);
-                  }}
-                >
-                  Revoke
-                </PromiseButton>
-              {:else if key.status === 'revoked'}
-                <PromiseButton
-                  variant="outline"
-                  promise={async () => {
-                    restoreKey(key.id);
-                  }}
-                >
-                  Restore
-                </PromiseButton>
-              {/if}
-            </Table.Cell>
-          </Table.Row>
-        {/if}
-      {/each}
+              <Table.Cell class="max-w-[10rem]">
+                <Paragraph class="truncate ">{getLocalDateTime(key.created_at)}</Paragraph>
+              </Table.Cell>
+              <Table.Cell class="max-w-[5rem]">
+                <Paragraph class="truncate ">
+                  <AvatarUser {user} />
+                </Paragraph>
+              </Table.Cell>
+              <Table.Cell class="max-w-[10rem] flex justify-end">
+                {#if key.status === 'active'}
+                  <PromiseButton
+                    variant="destructive_outline"
+                    promise={async () => {
+                      revokeKey(key.id);
+                    }}
+                  >
+                    Revoke
+                  </PromiseButton>
+                {:else if key.status === 'revoked'}
+                  <PromiseButton
+                    variant="outline"
+                    promise={async () => {
+                      restoreKey(key.id);
+                    }}
+                  >
+                    Restore
+                  </PromiseButton>
+                {/if}
+              </Table.Cell>
+            </Table.Row>
+          {/if}
+        {/each}
+      {/if}
     </Table.Body>
   </Table.Root>
 </div>

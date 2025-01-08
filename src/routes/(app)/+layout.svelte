@@ -99,16 +99,6 @@
                 </Sidebar.MenuButton>
               </Sidebar.MenuItem>
               <Sidebar.MenuItem>
-                <Sidebar.MenuButton isActive={currentPath.includes('/pipelines/templates')}>
-                  {#snippet child({ props })}
-                    <a href="/pipelines" {...props}>
-                      <FileTerminal />
-                      Pipeline Templates
-                    </a>
-                  {/snippet}
-                </Sidebar.MenuButton>
-              </Sidebar.MenuItem>
-              <Sidebar.MenuItem>
                 <Sidebar.MenuButton>
                   <BookOpen />
                   <a href="#"> Documentation </a>
@@ -154,9 +144,13 @@
                   </Sidebar.MenuButton>
                 </Sidebar.MenuItem>
                 <Sidebar.MenuItem>
-                  <Sidebar.MenuButton>
-                    <LayoutGrid />
-                    <a href="#"> Account </a>
+                  <Sidebar.MenuButton isActive={currentPath === '/account'}>
+                    {#snippet child({ props })}
+                      <a href="/account" {...props}>
+                        <LayoutGrid />
+                        Account
+                      </a>
+                    {/snippet}
                   </Sidebar.MenuButton>
                 </Sidebar.MenuItem>
               </Sidebar.Menu>

@@ -11,8 +11,17 @@
   import H4 from '$lib/components/ui/text/H4.svelte';
   import { Button } from '$lib/components/ui/button';
   import PipelinesList from '$lib/components/ui/pipelines-list/PipelinesList.svelte';
+  import type { PageData } from './$types';
+  import ProviderCard from '$lib/components/ui/provider-card/ProviderCard.svelte';
+  import { getUserName } from '$lib/utils/utils';
 
   let user: User | null = $state(null);
+
+  const {
+    data,
+  }: {
+    data: PageData;
+  } = $props();
 
   onMount(async () => {
     user = await UsersStore.getCurrentUser();
@@ -24,8 +33,7 @@
 <Navbar breadcrumbs={[{ label: 'Home', href: '/' }]} />
 <div class="flex-grow flex flex-col bg-background gap-6 p-6">
   <H1>
-    Hi {user?.user_metadata.preferred_username ?? user?.user_metadata.user_name ?? user?.user_metadata.name ?? 'there'},
-    what are we building today?
+    Hi {user ? getUserName(user) : 'there'}, what are we building today?
   </H1>
   <div class="flex gap-6 justify-start stretch">
     <Card.Root class="flex-grow min-w-xs">
@@ -60,5 +68,21 @@
       </Card.Content>
     </Card.Root>
   </div>
-  <PipelinesList maxRows={4} />
+  <PipelinesList maxRows={3} />
+  <div class="flex place-content-between">
+    <H4>Providers</H4>
+    <div class="flex gap-3">
+      <Button variant="default">Add new</Button>
+      <Button variant="outline" href="/providers">View all</Button>
+    </div>
+  </div>
+  <div class="grid auto-rows-min md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 items-start justify-start gap-6">
+    {#if data.providers}
+      {#each data.providers as provider}
+        <ProviderCard {provider} />
+      {/each}
+    {:else}
+      <p>{data.error}</p>
+    {/if}
+  </div>
 </div>

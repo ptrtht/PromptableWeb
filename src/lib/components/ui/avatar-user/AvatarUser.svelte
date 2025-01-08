@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { User } from '@supabase/supabase-js';
   import * as Avatar from '../avatar';
+  import { getUserAvatarUrl, getUserInitials, getUserName } from '$lib/utils/utils';
 
   const {
     user,
@@ -10,12 +11,11 @@
 </script>
 
 <Avatar.Root>
-  <Avatar.Image src={user?.user_metadata.avatar_url} alt={'@' + user?.user_metadata?.user_name} />
+  <Avatar.Image src={user ? getUserAvatarUrl(user) : ''} alt={'@' + (user ? getUserName(user) : '')} />
   <Avatar.Fallback>
     <!-- the initials of their name -->
-    {user?.user_metadata.full_name
-      ?.split(' ')
-      .map((name: string) => name.charAt(0))
-      .join('')}
+    {#if user}
+      {getUserInitials(user)}
+    {/if}
   </Avatar.Fallback>
 </Avatar.Root>

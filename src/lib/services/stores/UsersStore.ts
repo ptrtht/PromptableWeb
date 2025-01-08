@@ -82,18 +82,33 @@ export class UsersStore {
       password,
       options: {
         data: {
-          full_name: `${name} ${lastName}`,
-          user_name: name,
+          first_name: name,
+          last_name: lastName,
         },
       },
     });
 
     if (error) {
-      toast.error('Error signing up with email and password');
+      toast.error('This email is already in use');
       throw LoggingService.error('Error signing up with email and password', error);
     }
 
     await this.signInWithEmailPassword({ email, password });
+  }
+
+  static async updateUser(params: { email?: string; name?: string; lastName?: string }) {
+    const { error } = await supabase.auth.updateUser({
+      email: params.email,
+      data: {
+        first_name: params.name,
+        last_name: params.lastName,
+      },
+    });
+
+    if (error) {
+      toast.error('Error updating user');
+      throw LoggingService.error('Error updating user', error);
+    }
   }
 
   static async getCurrentUser() {

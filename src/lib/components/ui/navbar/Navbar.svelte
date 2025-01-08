@@ -18,7 +18,11 @@
   } = $props();
 </script>
 
-<div class="border-b w-full flex gap-2 h-16 items-center px-4 text-foreground bg-background">
+<!-- make sticky to top -->
+<div
+  class="border-b w-full flex gap-2 h-16 items-center px-4 text-foreground bg-background
+  sticky top-0 z-10 shadow-xs"
+>
   <Sidebar.Trigger />
   <Divider direction="vertical" class="py-6" />
   <dir class="flex-grow m-0 p-0 ml-1 flex place-content-between">

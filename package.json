@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "npm run supa:types && vite dev --port 5175 --open",
+    "dev": "npm run supa:types && vite dev --port 5175 ",
     "build": "vite build",
     "preview": "svelte-kit sync && vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

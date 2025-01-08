@@ -8,6 +8,7 @@
   import { UsersStore } from '$lib/services/stores/UsersStore';
   import { toast } from 'svelte-sonner';
   import { LoggingService } from '$lib/services/pipeline/LoggingService';
+  import { getUserFullName } from '$lib/utils/utils';
 
   const { children, ...props }: { children: Snippet } = $props();
 
@@ -26,7 +27,7 @@
         user: {
           id: user.id,
           email: user.email,
-          name: user.user_metadata.full_name ?? 'Anonymous',
+          name: getUserFullName(user),
         },
       };
 

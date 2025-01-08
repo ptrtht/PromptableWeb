@@ -1,4 +1,4 @@
-import { Users } from 'lucide-svelte';
+import { LoggingService } from '../pipeline/LoggingService';
 import { supabase } from '../utils/init';
 import { UsersStore } from './UsersStore';
 
@@ -15,10 +15,7 @@ export class VirtualKeyStore {
   }
 
   static async setKeyForProvider(params: { provider: string; key: string }) {
-    const { error } = await supabase
-      .from('virtual_keys')
-      .update({ key: params.key })
-      .eq('provider', params.provider)
+    const { error } = await supabase.from('virtual_keys').update({ key: params.key }).eq('provider', params.provider);
     //   .eq('user_id', auth.user().id);
 
     if (error) {
@@ -51,6 +48,25 @@ export class VirtualKeyStore {
 
     if (error) {
       throw new Error('Error restoring virtual key');
+    }
+  }
+
+  static async createVirtualKey(params: { provider: string; key: string }) {
+    // name: string
+    // key: string
+    // provider: string
+    // user_id: string
+    const user = await UsersStore.getCurrentUser();
+
+    const { error } = await supabase.from('virtual_keys').insert({
+      name: `Custom ${params.provider}`,
+      key: params.key,
+      provider: params.provider,
+      user_id: user.id,
+    });
+
+    if (error) {
+      throw LoggingService.error('Error creating virtual key', error);
     }
   }
 }
