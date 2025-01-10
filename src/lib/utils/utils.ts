@@ -1,4 +1,6 @@
+import type { PipelineConfigJson } from '$lib/services/schemas/PipelineConfig';
 import type { User } from '@supabase/supabase-js';
+import { getContext, setContext } from 'svelte';
 
 export const getLocalDateTime = (date: Date | string) => {
   const d = new Date(date);

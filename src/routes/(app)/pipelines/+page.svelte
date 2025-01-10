@@ -1,8 +1,10 @@
 <script>
+  import { goto } from '$app/navigation';
   import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import Navbar from '$lib/components/ui/navbar/Navbar.svelte';
   import PipelineTemplateCard from '$lib/components/ui/pipeline-template-card/PipelineTemplateCard.svelte';
+  import PromiseButton from '$lib/components/ui/promiseButton/PromiseButton.svelte';
   import H1 from '$lib/components/ui/text/H1.svelte';
   import H4 from '$lib/components/ui/text/H4.svelte';
   import Paragraph from '$lib/components/ui/text/Paragraph.svelte';
@@ -31,10 +33,10 @@
   <div class="flex w-full place-content-between pt-6">
     <div>
       <H4>Build your first pipeline</H4>
-      <Paragraph variant="muted">Securely manage API keys for your providers and services</Paragraph>
+      <Paragraph variant="muted">Create production-ready LLM workflows in minutes</Paragraph>
     </div>
     <div class="flex gap-3">
-      <Button variant="default" onclick={() => {}}>
+      <Button variant="default" href="/pipelines/new">
         <span class="flex gap-2 items-center">
           <Hammer />
           <span> Start Building </span>
@@ -54,7 +56,7 @@
       <Paragraph variant="muted">Build your first pipeline now or see an example first</Paragraph>
     </div>
     <div class="flex gap-3 items-center">
-      <Button>Start building</Button>
+      <Button href="/pipelines/new">Start building</Button>
       <Button variant="outline">See an example</Button>
     </div>
   </div>

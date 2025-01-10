@@ -73,10 +73,6 @@ export abstract class BaseNode {
     return { success: false, error: lastError };
   }
 
-  async validateInput(input: unknown): Promise<z.SafeParseReturnType<any, any>> {
-    return this.inputSchema.safeParse(input);
-  }
-
   abstract execute(config: any): Promise<any>;
 
   async validateOutput(output: unknown): Promise<z.SafeParseReturnType<any, any>> {

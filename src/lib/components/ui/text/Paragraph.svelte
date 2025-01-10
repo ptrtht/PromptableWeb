@@ -15,7 +15,7 @@
 </script>
 
 <p
-  class={'leading-7 ' +
+  class={' ' +
     (variant === 'foreground' ? ' text-foreground ' : '') +
     (variant === 'muted' ? ' text-muted-foreground ' : '') +
     (variant === 'error' ? ' text-destructive ' : '') +

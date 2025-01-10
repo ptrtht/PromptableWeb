@@ -1,5 +1,5 @@
 // routes/api/pipeline/execute/+server.ts
-import type { PipelineConfig } from '$lib/schemas/PipelineConfig';
+import type { PipelineConfig } from '$lib/services/schemas/PipelineConfig';
 import { CredentialResolver } from '$lib/services/pipeline/context/CredentialResolver';
 import { ExecutionContext } from '$lib/services/pipeline/context/ExecutionContext';
 import { InputResolver } from '$lib/services/pipeline/context/InputResolver';

@@ -40,20 +40,29 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          modified_at: string
+          name: string
           pipeline: Json
           user_id: string
+          version: number
         }
         Insert: {
           created_at?: string
           id?: string
+          modified_at?: string
+          name?: string
           pipeline: Json
           user_id: string
+          version?: number
         }
         Update: {
           created_at?: string
           id?: string
+          modified_at?: string
+          name?: string
           pipeline?: Json
           user_id?: string
+          version?: number
         }
         Relationships: []
       }

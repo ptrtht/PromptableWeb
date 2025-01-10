@@ -86,7 +86,7 @@
   <div class="flex place-content-between">
     <H4>Your pipelines</H4>
     <div class="flex gap-3">
-      <Button variant="default">Create new</Button>
+      <Button variant="default" href="pipelines/new">Create new</Button>
       <Button
         variant="outline"
         onclick={() => {

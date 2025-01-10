@@ -1,4 +1,4 @@
-import { PipelineConfigSchema, type PipelineConfig } from '$lib/schemas/PipelineConfig';
+import { PipelineConfigSchema, type PipelineConfig } from '$lib/services/schemas/PipelineConfig';
 import { z } from 'zod';
 import { NodeService } from './NodeService';
 import { LoggingService } from './LoggingService';
@@ -100,14 +100,6 @@ export class Pipeline {
           ...(await this.resolveVariablesDeep(nodeConfig.config)),
           credentials: nodeConfig.credentials,
         };
-
-        // Validate input
-        const inputValidation = await node.validateInput(resolvedConfig);
-        if (!inputValidation.success) {
-          await LoggingService.log('error', `Input validation failed for node ${nodeId}`, inputValidation.error);
-          this.context.setNodeState(nodeId, resolvedConfig, null, 'error');
-          throw new Error(`Input validation failed for node ${nodeId}`);
-        }
 
         // Execute node
         const result = await node.execute(resolvedConfig);

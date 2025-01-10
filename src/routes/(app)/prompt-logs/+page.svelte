@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PromptLogsStore } from '$lib/services/stores/PromptLogsStore';
-  import type { Json } from '$lib/services/utils/init';
+  import type { Json } from '$lib/services/schemas/supabase.types';
   import { onMount } from 'svelte';
 
   let selectedLogId = $state<number | null>(null);
