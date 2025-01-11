@@ -13,6 +13,8 @@
   import * as Select from '../select';
   import { slide } from 'svelte/transition';
   import { SchemaTypeEnum } from '$lib/services/schemas/PipelineConfig';
+  import CodeInput from '../code-input/CodeInput.svelte';
+  import ToggleMenu from '../togge-menu/ToggleMenu.svelte';
 
   let {
     open = $bindable(false),
@@ -38,11 +40,6 @@
       };
     }
   });
-
-  //
-  //
-  //
-  //
 
   type SchemaType = 'string' | 'number' | 'boolean' | 'array' | 'object';
   type Schema = Record<string, SchemaType>;
@@ -123,6 +120,8 @@
       return store;
     });
   }
+
+  let selectedMenuItems: string[] = $state(['API Request']);
 </script>
 
 <BaseNodeSidebar bind:open>
@@ -145,19 +144,50 @@
     A webhook trigger is a URL that you can use to trigger a pipeline from an external service
   </Paragraph>
   {#if $pipelineEditingStore}
-    <div class="flex flex-col gap-2 pt-6">
-      <Label>
-        <H4>Webhook URL</H4>
-      </Label>
-      <Paragraph variant="muted">This URL can be used to trigger this pipeline from an external service</Paragraph>
-      <span class="flex w-full items-center space-x-2">
-        <!-- allows see the first 5 chars, replace the rest with * -->
-        <Input type="text" value={requestURL} disabled />
-        <Button onclick={() => copyUrl()}>
-          <Copy />
-        </Button>
-      </span>
+    <div class="flex flex-col gap-4">
+      <ToggleMenu
+        menuItems={[{ title: 'API Request' }, { title: 'Promptable SDK' }]}
+        bind:selectedMenuItems
+        singleSelection
+      />
+
+      {#if selectedMenuItems.includes('API Request')}
+        <div class="flex flex-col gap-2">
+          <Label>
+            <H4>Webhook URL</H4>
+          </Label>
+          <Paragraph variant="muted">This URL can be used to trigger this pipeline from an external service</Paragraph>
+          <span class="flex w-full items-center space-x-2">
+            <!-- allows see the first 5 chars, replace the rest with * -->
+            <Input type="text" value={requestURL} disabled />
+            <Button onclick={() => copyUrl()}>
+              <Copy />
+            </Button>
+          </span>
+        </div>
+      {/if}
+
+      {#if selectedMenuItems.includes('Promptable SDK')}
+        <Label>
+          <H4>Promptable SDK</H4>
+        </Label>
+        <div class="flex-grow h-content">
+          <CodeInput
+            disabled
+            value={`const promptable = new Promptable('<API_KEY>')
+
+const response = await promptable.pipeline(
+    '${$pipelineEditingStore.id}',
+      {
+        key: 'value'
+      }
+    )
+`}
+          />
+        </div>
+      {/if}
     </div>
+
     <div class="flex flex-col gap-2">
       <Label>
         <H4>Input validation</H4>
@@ -174,6 +204,9 @@
       <div class="flex flex-col gap-2" transition:slide>
         <Label>
           <H4>Input Body Schema</H4>
+          <Paragraph variant="muted">
+            Define the schema for the incoming request body. This will be used to validate the incoming request
+          </Paragraph>
         </Label>
         <div class="grid gap-2">
           {#each entries as entry (entry.originalKey)}

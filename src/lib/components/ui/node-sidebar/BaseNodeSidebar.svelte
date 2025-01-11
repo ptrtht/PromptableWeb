@@ -19,7 +19,7 @@
 
 {#if open}
   <div
-    class="card bg-background shadow-md border border-3 border-muted absolute top-0 right-0 w-full max-w-md h-full p-6 flex flex-col gap-6"
+    class="card bg-background shadow-md border border-3 border-muted absolute top-0 right-0 w-full max-w-md h-full p-6 flex flex-col gap-6 z-50"
     transition:fly={{ x: 620, duration: 500 }}
   >
     <div class="flex place-content-between items-center">

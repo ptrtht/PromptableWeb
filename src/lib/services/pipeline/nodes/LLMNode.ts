@@ -2,54 +2,26 @@ import { z } from 'zod';
 import { BaseNode } from './BaseNode';
 import { LoggingService } from '../LoggingService';
 import { OpenAIService } from '../OpenAIService';
+import {
+  LLMNodeInputSchema,
+  LLMNodeOutputSchema,
+  LLMProviderSchema,
+  MessageSchema,
+} from '$lib/services/schemas/nodes/LLMNode';
 
 // Message format schema following OpenAI's structure
-const MessageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant']),
-  content: z.string(),
-  name: z.string().optional(),
-});
+export const providerMap = {
+  openai: 'OpenAI',
+  anthropic: 'Anthropic',
+};
 
-const LLMProviderSchema = z.enum(['openai', 'anthropic']);
 type LLMProvider = z.infer<typeof LLMProviderSchema>;
 
 export class LLMNode extends BaseNode {
   readonly type = 'llm';
 
-  readonly inputSchema = z.object({
-    model: z
-      .string()
-      .regex(
-        /^(openai|anthropic)\/[a-zA-Z0-9-]+$/,
-        'Model must be in format: LLMProvider/model, where LLMProvider is either openai or anthropic'
-      ),
-    messages: z.array(MessageSchema),
-    temperature: z.number().min(0).max(2).optional().default(0.7),
-    max_tokens: z.number().positive().optional(),
-    top_p: z.number().min(0).max(1).optional(),
-    frequency_penalty: z.number().min(-2).max(2).optional(),
-    presence_penalty: z.number().min(-2).max(2).optional(),
-    stop: z.union([z.string(), z.array(z.string())]).optional(),
-    credentials: z.array(
-      z.object({
-        virtualKeyId: z.string().regex(/^virtual_/),
-        provider: LLMProviderSchema,
-      })
-    ),
-    userId: z.string().optional(),
-  });
-
-  readonly outputSchema = z.object({
-    response: z.object({
-      role: z.literal('assistant'),
-      content: z.string(),
-    }),
-    usage: z.object({
-      prompt_tokens: z.number(),
-      completion_tokens: z.number(),
-      total_tokens: z.number(),
-    }),
-  });
+  readonly inputSchema = LLMNodeInputSchema;
+  readonly outputSchema = LLMNodeOutputSchema;
 
   async execute(config: z.infer<typeof this.inputSchema>) {
     return await this.executeWithRetry(async () => {
@@ -58,7 +30,7 @@ export class LLMNode extends BaseNode {
 
       LoggingService.log('debug', 'Starting execution', { provider, modelName });
 
-      const apiKey = await this.getApiKeyForProvider(config.credentials, provider, config.userId);
+      const apiKey = await this.getApiKeyForProvider(config.credentials, providerMap[provider], config.userId);
 
       LoggingService.log('debug', 'Retrieved API key');
 

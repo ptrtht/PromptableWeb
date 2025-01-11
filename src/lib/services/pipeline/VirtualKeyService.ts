@@ -13,7 +13,6 @@ type VirtualKeyResponse = z.infer<typeof VirtualKeyResponseSchema>;
 
 export class VirtualKeyService {
   static async getKey(params: {
-    user_id?: string;
     virtualKeyId: string;
     provider?: string;
   }): Promise<VirtualKeyResponse> {

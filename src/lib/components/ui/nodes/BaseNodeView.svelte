@@ -4,10 +4,10 @@
   import * as Card from '$lib/components/ui/card/index.js';
   import Separator from '../separator/separator.svelte';
 
-  const {
+  let {
     children,
     header,
-    active = false,
+    active = $bindable(false),
     class: className,
     onclick,
   }: {
@@ -20,8 +20,11 @@
 </script>
 
 <Card.Root
-  class={cn('min-h-[13rem] w-full max-w-sm cursor-pointer ', className)}
-  {onclick}
+  class={cn('min-h-[13rem] w-full max-w-sm cursor-pointer z-10', className)}
+  onclick={() => {
+    active = !active;
+    onclick?.();
+  }}
   onkeydown={(e) => {
     if (e.key === 'Enter') {
       onclick?.();

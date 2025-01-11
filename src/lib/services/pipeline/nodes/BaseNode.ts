@@ -23,7 +23,6 @@ export abstract class BaseNode {
 
   protected async resolveCredentials(credentials: NodeCredential[], userId?: string): Promise<ResolvedCredential[]> {
     return CredentialResolverService.resolveCredentials({
-      user_id: userId,
       credentials,
     });
   }
@@ -35,6 +34,9 @@ export abstract class BaseNode {
   ): Promise<string> {
     const resolvedCredentials = await this.resolveCredentials(credentials, userId);
     const credential = resolvedCredentials.find((cred) => cred.provider === provider);
+
+    // log all resolved credentials
+    LoggingService.log('debug', 'Resolved credentials', resolvedCredentials);
 
     if (!credential) {
       throw LoggingService.error(`No ${provider} API key found`, { credentials });

@@ -36,6 +36,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pipeline_runs: {
+        Row: {
+          created_at: string
+          id: number
+          input: Json | null
+          log: Json
+          pipeline_id: string
+          price: number
+          result: Database["public"]["Enums"]["pipeline_result"]
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          input?: Json | null
+          log: Json
+          pipeline_id: string
+          price: number
+          result: Database["public"]["Enums"]["pipeline_result"]
+          version: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          input?: Json | null
+          log?: Json
+          pipeline_id?: string
+          price?: number
+          result?: Database["public"]["Enums"]["pipeline_result"]
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_runs_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "pipelines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pipeline_runs_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "v_pipeline_stats_total"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pipelines: {
         Row: {
           created_at: string
@@ -161,12 +209,28 @@ export type Database = {
         }
         Relationships: []
       }
+      v_pipeline_stats_total: {
+        Row: {
+          created_at: string | null
+          error_rate: number | null
+          id: string | null
+          modified_at: string | null
+          name: string | null
+          price_per_run: number | null
+          status: string | null
+          total_runs: number | null
+          user_id: string | null
+          version: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
     }
     Enums: {
       api_key_status_enum: "active" | "revoked" | "deleted"
+      pipeline_result: "Success" | "Fail" | "Warn"
     }
     CompositeTypes: {
       [_ in never]: never

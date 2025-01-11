@@ -1,23 +1,23 @@
 <script lang="ts">
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
-  import { Zap } from 'lucide-svelte';
+  import { Webhook, Zap } from 'lucide-svelte';
   import WebhookTriggerSidebar from '../../node-sidebar/WebhookTriggerSidebar.svelte';
   import BaseNodeView from '../BaseNodeView.svelte';
   import H4 from '../../text/H4.svelte';
   import { cn } from '$lib/utils';
   import Paragraph from '../../text/Paragraph.svelte';
+  import { Label } from '../../label';
 
-  let active = $state(true);
+  let active = $state(false);
 </script>
 
 {#if $pipelineEditingStore}
   <BaseNodeView
-    {active}
+    bind:active
     class={cn(
       'border border-width:5 border-primary/25 shadow-none',
       active ? 'border-primary border-dashed' : 'border-background'
     )}
-    onclick={() => (active = true)}
   >
     {#snippet header()}
       <div class={'flex items-center gap-2 '}>
@@ -25,13 +25,13 @@
         <H4>Pipeline trigger</H4>
       </div>
     {/snippet}
-
-    <Paragraph variant="muted">
-        Input validation: {$pipelineEditingStore.pipeline.input.validate ? 'Enabled' : 'Disabled'}
-      </Paragraph>
-
-    <!-- debug -->
-    <pre>{JSON.stringify($pipelineEditingStore.pipeline.input, null, 2)}</pre>
+    <Label>Type</Label>
+    <div class="flex gap-2 items-center">
+      <Webhook />
+      <Paragraph variant="muted">Webhook trigger</Paragraph>
+    </div>
   </BaseNodeView>
 {/if}
+
+
 <WebhookTriggerSidebar bind:open={active} />

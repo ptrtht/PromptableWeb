@@ -17,11 +17,8 @@ type ResolvedCredential = {
 };
 
 export class CredentialResolverService {
-  static async resolveCredentials(params: {
-    user_id?: string;
-    credentials: CredentialConfig[];
-  }): Promise<ResolvedCredential[]> {
-    const { user_id, credentials } = params;
+  static async resolveCredentials(params: { credentials: CredentialConfig[] }): Promise<ResolvedCredential[]> {
+    const { credentials } = params;
 
     // Validate all credential configs first
     credentials.forEach((cred) => CredentialConfigSchema.parse(cred));
@@ -30,7 +27,6 @@ export class CredentialResolverService {
     const resolvedCredentials = await Promise.all(
       credentials.map((cred) =>
         VirtualKeyService.getKey({
-          user_id,
           virtualKeyId: cred.virtualKeyId,
           provider: cred.provider,
         })

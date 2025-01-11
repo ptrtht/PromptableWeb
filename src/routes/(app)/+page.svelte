@@ -80,6 +80,7 @@
       </Card.Root>
     </div>
     <PipelinesList maxRows={3} />
+
     <div class="flex place-content-between">
       <H4>Providers</H4>
       <div class="flex gap-3">
@@ -89,7 +90,7 @@
     </div>
     <div class="grid auto-rows-min md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 items-start justify-start gap-6">
       {#if data.providers}
-        {#each data.providers as provider}
+        {#each data.providers ?? [] as provider}
           <ProviderCard {provider} />
         {/each}
       {:else}
@@ -101,35 +102,7 @@
       <H1>Get started</H1>
       <Paragraph variant="muted">Set up your Promptable account and start building in minutes</Paragraph>
     </div>
-    <div class="flex w-full place-content-between pt-6">
-      <div>
-        <H4>Build your first pipeline</H4>
-        <Paragraph variant="muted">Create production-ready LLM workflows in minutes</Paragraph>
-      </div>
-      <div class="flex gap-3">
-        <Button variant="default" onclick={() => {}}>
-          <span class="flex gap-2 items-center">
-            <Hammer />
-            <span> Start Building </span>
-          </span>
-        </Button>
-      </div>
-    </div>
-    <div class="border-dashed border-2 border-muted w-full flex flex-col items-center p-6 gap-6 rounded-xl">
-      <Card.Root class="rounded-xl shadow-md">
-        <Card.Content class="p-4">
-          <SquareTerminal size="2rem" />
-        </Card.Content>
-      </Card.Root>
-      <div class="text-center">
-        <H4>No pipelines built yet</H4>
-        <Paragraph variant="muted">Build your first pipeline now or see an example first</Paragraph>
-      </div>
-      <div class="flex gap-3 items-center">
-        <Button>Start building</Button>
-        <Button variant="outline">See an example</Button>
-      </div>
-    </div>
+    <PipelinesList maxRows={3} />
     <div class="flex w-full place-content-between pt-6">
       <div>
         <H4>Pipeline templates</H4>

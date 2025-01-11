@@ -29,7 +29,7 @@ export class LoggingService {
     }
 
     // Console output for development
-    console.log(`[${level.toUpperCase()}] ${message}`, data ? data : '');
+    console.log(`[${level.toUpperCase()}] ${message}`, data ? JSON.stringify(data, null, 2) : '');
   }
 
   static getLogs(): LogEntry[] {

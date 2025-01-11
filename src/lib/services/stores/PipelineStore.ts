@@ -1,13 +1,32 @@
 import { LoggingService } from '../pipeline/LoggingService';
-import type { PipelineConfig } from '../schemas/PipelineConfig';
-import { supabase, type Tables } from '../utils/init';
+import type { PipelineConfig, PipelineConfigJson } from '../schemas/PipelineConfig';
+import { supabase, Views, type Tables } from '../utils/init';
 import { UsersStore } from './UsersStore';
 
 export class PipelineStore {
-  static async getPipeline(id: string) {
+  static async getPipeline(id: string): Promise<Tables['pipelines']['Row']> {
     const { data, error } = await supabase.from('pipelines').select().eq('id', id).single();
     if (error) {
       throw LoggingService.error('Error getting pipeline', error);
+    }
+    return data;
+  }
+
+  static async getPipelines(): Promise<Tables['pipelines']['Row'][]> {
+    const { data, error } = await supabase.from('pipelines').select('*');
+    if (error) {
+      throw LoggingService.error('Error getting pipelines', error);
+    }
+    return data as Tables['pipelines']['Row'][];
+  }
+
+  static async getPipelinesWithStats(): Promise<Views['v_pipeline_stats_total']['Row'][]> {
+    const user = await UsersStore.getCurrentUser();
+
+    // ? There is no RLS on this view need to manually filter for users.
+    const { data, error } = await supabase.from('v_pipeline_stats_total').select('*').eq('user_id', user.id);
+    if (error) {
+      throw LoggingService.error('Error getting pipelines with stats', error);
     }
     return data;
   }

@@ -9,6 +9,9 @@ import * as generated from "./supabase.schemas";
 export type PublicApiKeyStatusEnum = z.infer<
   typeof generated.publicApiKeyStatusEnumSchema
 >;
+export type PublicPipelineResult = z.infer<
+  typeof generated.publicPipelineResultSchema
+>;
 export type Json = z.infer<typeof generated.jsonSchema>;
 export type PublicApiKeysRowSchema = z.infer<
   typeof generated.publicApiKeysRowSchemaSchema
@@ -21,6 +24,18 @@ export type PublicApiKeysUpdateSchema = z.infer<
 >;
 export type PublicApiKeysRelationshipsSchema = z.infer<
   typeof generated.publicApiKeysRelationshipsSchemaSchema
+>;
+export type PublicPipelineRunsRowSchema = z.infer<
+  typeof generated.publicPipelineRunsRowSchemaSchema
+>;
+export type PublicPipelineRunsInsertSchema = z.infer<
+  typeof generated.publicPipelineRunsInsertSchemaSchema
+>;
+export type PublicPipelineRunsUpdateSchema = z.infer<
+  typeof generated.publicPipelineRunsUpdateSchemaSchema
+>;
+export type PublicPipelineRunsRelationshipsSchema = z.infer<
+  typeof generated.publicPipelineRunsRelationshipsSchemaSchema
 >;
 export type PublicPipelinesRowSchema = z.infer<
   typeof generated.publicPipelinesRowSchemaSchema
@@ -75,4 +90,10 @@ export type PublicVOrphanedVirtualKeysRowSchema = z.infer<
 >;
 export type PublicVOrphanedVirtualKeysRelationshipsSchema = z.infer<
   typeof generated.publicVOrphanedVirtualKeysRelationshipsSchemaSchema
+>;
+export type PublicVPipelineStatsTotalRowSchema = z.infer<
+  typeof generated.publicVPipelineStatsTotalRowSchemaSchema
+>;
+export type PublicVPipelineStatsTotalRelationshipsSchema = z.infer<
+  typeof generated.publicVPipelineStatsTotalRelationshipsSchemaSchema
 >;

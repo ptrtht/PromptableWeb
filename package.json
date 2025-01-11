@@ -48,6 +48,7 @@
     "@notionhq/client": "^2.2.15",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
+    "highlight.js": "^11.11.1",
     "loadash": "^1.0.0",
     "monaco-editor": "^0.52.2",
     "openai": "^4.77.0",

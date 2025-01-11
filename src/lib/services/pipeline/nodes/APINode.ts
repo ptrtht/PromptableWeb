@@ -1,22 +1,14 @@
 import { z } from 'zod';
 import { BaseNode } from './BaseNode';
 import { LoggingService } from '../LoggingService';
+import { APINodeInputSchema, APINodeOutputSchema } from '$lib/services/schemas/nodes/APINode';
 
 export class APINode extends BaseNode {
   readonly type = 'api';
 
-  readonly inputSchema = z.object({
-    url: z.string().url(),
-    method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
-    headers: z.record(z.string()).optional(),
-    body: z.any().optional(),
-  });
+  readonly inputSchema = APINodeInputSchema;
 
-  readonly outputSchema = z.object({
-    status: z.number(),
-    data: z.any(),
-    headers: z.record(z.string()),
-  });
+  readonly outputSchema = APINodeOutputSchema;
 
   async execute(config: z.infer<typeof this.inputSchema>) {
     return this.executeWithRetry(async () => {

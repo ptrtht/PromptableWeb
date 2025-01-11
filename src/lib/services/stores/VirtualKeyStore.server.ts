@@ -3,28 +3,22 @@ import { supaAdmin } from '../utils/init.server';
 import { VirtualKeyStore } from './VirtualKeyStore';
 
 export class VirtualKeyServerStore extends VirtualKeyStore {
+  // we overwrite tihs since no user, no login, so supa client doesnt work due to RLS
+
   static async getKey({
-    user_id,
     virtualKeyId,
-    provider,
   }: {
-    user_id?: string;
     virtualKeyId: string;
-    provider?: string;
   }) {
-    let query = supaAdmin.from('virtual_keys').select('*').eq('id', virtualKeyId);
 
-    if (user_id) {
-      query = query.eq('user_id', user_id);
-    }
-    if (provider) {
-      query = query.eq('provider', provider);
-    }
+    const { data, error } = await supaAdmin.from('virtual_keys').select('*').eq('id', virtualKeyId);
 
-    const { data, error } = await query;
+    // try log all keys
+    // const { data: allKeys, error: allKeysError } = await supaAdmin.from('virtual_keys').select('*');
+    // LoggingService.info('All virtual keys', {allKeys, allKeysError});
 
     if (error || !data || data.length === 0) {
-      throw LoggingService.error('Error getting virtual key', error);
+      throw LoggingService.error('Error getting virtual key', {error, virtualKeyId});
     }
 
     return data[0];

@@ -86,8 +86,8 @@ export class Pipeline {
 
   async execute(): Promise<{ success: boolean; state: any; error?: Error }> {
     try {
-      for (const nodeId of this.config.executionOrder) {
-        const nodeConfig = this.config.nodes[nodeId];
+      for (const nodeId of this.config.pipeline.executionOrder) {
+        const nodeConfig = this.config.pipeline.nodes[nodeId];
         if (!nodeConfig) {
           throw new Error(`Node ${nodeId} not found in pipeline configuration`);
         }
@@ -146,8 +146,8 @@ export class Pipeline {
     if (result.success) {
       // Additional validation:
       // 1. Check if executionOrder contains all nodes
-      const nodeIds = new Set(Object.keys(result.data.nodes));
-      const orderIds = new Set(result.data.executionOrder);
+      const nodeIds = new Set(Object.keys(result.data.pipeline.nodes));
+      const orderIds = new Set(result.data.pipeline.executionOrder);
 
       if (nodeIds.size !== orderIds.size) {
         return {

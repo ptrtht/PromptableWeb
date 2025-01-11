@@ -5,12 +5,18 @@
  */
 
 import { z } from "zod";
-import type { Json } from "./supabase.types";
+import { Json } from "./supabase.types";
 
 export const publicApiKeyStatusEnumSchema = z.union([
   z.literal("active"),
   z.literal("revoked"),
   z.literal("deleted"),
+]);
+
+export const publicPipelineResultSchema = z.union([
+  z.literal("Success"),
+  z.literal("Fail"),
+  z.literal("Warn"),
 ]);
 
 export const jsonSchema: z.ZodSchema<Json> = z.lazy(() =>
@@ -53,6 +59,56 @@ export const publicApiKeysUpdateSchemaSchema = z.object({
 });
 
 export const publicApiKeysRelationshipsSchemaSchema = z.tuple([]);
+
+export const publicPipelineRunsRowSchemaSchema = z.object({
+  created_at: z.string(),
+  id: z.number(),
+  input: jsonSchema.nullable(),
+  log: jsonSchema,
+  pipeline_id: z.string(),
+  price: z.number(),
+  result: publicPipelineResultSchema,
+  version: z.number(),
+});
+
+export const publicPipelineRunsInsertSchemaSchema = z.object({
+  created_at: z.string().optional(),
+  id: z.number().optional(),
+  input: jsonSchema.optional().nullable(),
+  log: jsonSchema,
+  pipeline_id: z.string(),
+  price: z.number(),
+  result: publicPipelineResultSchema,
+  version: z.number(),
+});
+
+export const publicPipelineRunsUpdateSchemaSchema = z.object({
+  created_at: z.string().optional(),
+  id: z.number().optional(),
+  input: jsonSchema.optional().nullable(),
+  log: jsonSchema.optional(),
+  pipeline_id: z.string().optional(),
+  price: z.number().optional(),
+  result: publicPipelineResultSchema.optional(),
+  version: z.number().optional(),
+});
+
+export const publicPipelineRunsRelationshipsSchemaSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal("pipeline_runs_pipeline_id_fkey"),
+    columns: z.tuple([z.literal("pipeline_id")]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal("pipelines"),
+    referencedColumns: z.tuple([z.literal("id")]),
+  }),
+  z.object({
+    foreignKeyName: z.literal("pipeline_runs_pipeline_id_fkey"),
+    columns: z.tuple([z.literal("pipeline_id")]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal("v_pipeline_stats_total"),
+    referencedColumns: z.tuple([z.literal("id")]),
+  }),
+]);
 
 export const publicPipelinesRowSchemaSchema = z.object({
   created_at: z.string(),
@@ -184,3 +240,18 @@ export const publicVOrphanedVirtualKeysRowSchemaSchema = z.object({
 });
 
 export const publicVOrphanedVirtualKeysRelationshipsSchemaSchema = z.tuple([]);
+
+export const publicVPipelineStatsTotalRowSchemaSchema = z.object({
+  created_at: z.string().nullable(),
+  error_rate: z.number().nullable(),
+  id: z.string().nullable(),
+  modified_at: z.string().nullable(),
+  name: z.string().nullable(),
+  price_per_run: z.number().nullable(),
+  status: z.string().nullable(),
+  total_runs: z.number().nullable(),
+  user_id: z.string().nullable(),
+  version: z.number().nullable(),
+});
+
+export const publicVPipelineStatsTotalRelationshipsSchemaSchema = z.tuple([]);
