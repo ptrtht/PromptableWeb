@@ -21,7 +21,7 @@
 <!-- make sticky to top -->
 <div
   class="border-b w-full flex gap-2 h-16 items-center px-4 text-foreground bg-background
-  sticky top-0 z-10 shadow-xs"
+  sticky top-0 z-50 shadow-xs"
 >
   <Sidebar.Trigger />
   <Divider direction="vertical" class="py-6" />

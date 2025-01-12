@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { publicPipelinesRowSchemaSchema } from './supabase.schemas';
+import { LLMNodeInputSchema } from './nodes/LLMNode';
+import { APINodeInputSchema } from './nodes/APINode';
 
-export const NodeConfigSchema = z.object({
-  type: z.string(),
-  config: z.record(z.any()),
+const BaseNodeConfigSchema = z.object({
+  name: z.string().optional(),
   credentials: z
     .array(
       z.object({
@@ -13,6 +14,17 @@ export const NodeConfigSchema = z.object({
     )
     .optional(),
 });
+
+export const NodeConfigSchema = z.discriminatedUnion('type', [
+  BaseNodeConfigSchema.extend({
+    type: z.literal('llm'),
+    config: LLMNodeInputSchema,
+  }),
+  BaseNodeConfigSchema.extend({
+    type: z.literal('api_call'),
+    config: APINodeInputSchema,
+  }),
+]);
 
 export const SchemaTypeEnum = z.enum(['string', 'number', 'boolean', 'object', 'array']);
 

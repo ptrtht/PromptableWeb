@@ -1,41 +1,47 @@
 <script lang="ts">
-  import { X } from 'lucide-svelte';
-  import { Button } from '../button';
-  import { fly, slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import type { Snippet } from 'svelte';
+  import type { CurrentlyActiveNodeType } from '$lib/components/utils';
+  import { tweened } from 'svelte/motion';
+  import { cubicOut } from 'svelte/easing';
 
   let {
-    open = $bindable(false),
-    actions,
-    title,
+    currentlyActiveNode = $bindable(),
     children,
   }: {
-    open: boolean;
-    actions?: Snippet;
-    title: Snippet;
+    currentlyActiveNode: CurrentlyActiveNodeType;
     children: Snippet;
   } = $props();
+
+  const sidebarWidth = tweened(0, {
+    duration: 500,
+    easing: cubicOut,
+  });
+
+  $effect(() => {
+    if (currentlyActiveNode) {
+      sidebarWidth.set(56);
+    } else {
+      sidebarWidth.set(0);
+    }
+  });
 </script>
 
-{#if open}
-  <div
-    class="card bg-background shadow-md border border-3 border-muted absolute top-0 right-0 w-full max-w-md h-full p-6 flex flex-col gap-6 z-50"
-    transition:fly={{ x: 620, duration: 500 }}
-  >
-    <div class="flex place-content-between items-center">
-      {@render title()}
-      <Button variant="ghost" onclick={() => (open = false)}>
-        <X />
-      </Button>
-    </div>
-    <div class="flex-1 overflow-y-auto flex flex-col gap-6">
+<div class="layout-wrapper flex w-full max-w-xl" style="width: {$sidebarWidth}rem">
+  {#if currentlyActiveNode}
+    <div
+      class="
+    sticky top-[3.75rem]
+    card bg-background shadow-md
+    border-l border-b border-3 border-muted
+    w-full max-w-xl
+    p-6 flex flex-col gap-6 z-50
+    max-h-[calc(100vh-4rem)]
+    pb-20 overflow-y-auto
+    "
+      transition:fly={{ x: 620, duration: 500 }}
+    >
       {@render children()}
     </div>
-
-    {#if actions}
-      <div class="flex mt-auto">
-        {@render actions()}
-      </div>
-    {/if}
-  </div>
-{/if}
+  {/if}
+</div>

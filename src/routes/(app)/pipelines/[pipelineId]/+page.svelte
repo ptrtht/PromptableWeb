@@ -7,7 +7,11 @@
   import H4 from '$lib/components/ui/text/H4.svelte';
   import Paragraph from '$lib/components/ui/text/Paragraph.svelte';
   import { LoggingService } from '$lib/services/pipeline/LoggingService';
-  import { PipelineConfigSchema, type PipelineConfig } from '$lib/services/schemas/PipelineConfig';
+  import {
+    type PipelineConfigJson,
+    PipelineConfigSchema,
+    type PipelineConfig,
+  } from '$lib/services/schemas/PipelineConfig';
   import { PipelineStore } from '$lib/services/stores/PipelineStore';
   import { EllipsisVertical, Plus } from 'lucide-svelte';
   import { onMount } from 'svelte';
@@ -22,11 +26,16 @@
   import { Label } from '$lib/components/ui/label';
   import { Input } from '$lib/components/ui/input';
   import { supabase } from '$lib/services/utils/init';
-  import throttle from 'lodash/throttle';
+  import NodeSidebarView from '$lib/components/ui/node-sidebar/NodeSidebarView.svelte';
+  import { fly } from 'svelte/transition';
 
   let pipelineRow: PipelineConfig | null = $state(null);
   let newPipelineName = $state('');
   let renameDialogOpen = $state(false);
+  let currentlyActiveNode: null | keyof PipelineConfigJson['nodes'] = $state(
+    // DEV
+    '8ce124d7-a284-4d8a-8d18-4568c6c04f76'
+  );
 
   const savePipeline = async () => {
     if (pipelineRow) {
@@ -66,6 +75,13 @@
       LoggingService.error('Failed to get pipeline', error);
       toast.error('Pipeline not found');
       goto('/pipelines');
+    }
+
+    // scroll to #scroll-start
+    const scrollStart = document.getElementById('scroll-start');
+    console.log('scrollStart', scrollStart);
+    if (scrollStart) {
+      scrollStart.scrollIntoView();
     }
   });
 </script>
@@ -132,34 +148,37 @@
 </Navbar>
 
 <GridBackground>
-  <div class="relative z-5 w-full h-full flex items-center justify-center flex-col">
-    {#if pipelineRow}
-      <!-- INPUT NODE -->
-      {#if !$pipelineEditingStore?.pipeline.input}
-        <!-- DEBUG -->
-        <div class="h-full flex flex-col gap-6 justify-center-items-center">
-          <div class="text-center max-w-sm text-balance">
-            <H4>Add a pipeline trigger</H4>
-            <Paragraph>A pipeline trigger is your user's initial input that will trigger this pipeline</Paragraph>
-          </div>
-          <AddTriggerNodeView>
-            <div class="flex gap-2 items-center">
-              <Plus size="1rem" />
-              Add trigger
+  <div class="flex">
+    <div class="relative w-full h-full flex flex-col flex-grow items-center justify-center py-[100vh]">
+      <span class="max-h-0 pt-[10rem]" id="scroll-start"></span>
+      {#if pipelineRow}
+        <!-- INPUT NODE -->
+        {#if !$pipelineEditingStore?.pipeline.input}
+          <div class="h-full flex flex-col gap-6 justify-center-items-center">
+            <div class="text-center max-w-sm text-balance">
+              <H4>Add a pipeline trigger</H4>
+              <Paragraph>A pipeline trigger is your user's initial input that will trigger this pipeline</Paragraph>
             </div>
-          </AddTriggerNodeView>
-        </div>
-      {:else}
-        <pre>{JSON.stringify($pipelineEditingStore.pipeline, null, 2)}</pre>
-        <WebhookTriggerNodeView />
-        <!-- draw line that connects the nodes -->
-        <NodeConnector startNode="input" />
-        {#each Object.entries($pipelineEditingStore.pipeline.nodes) as [name, node]}
-          <NodeView active={false} />
-
-          <NodeConnector startNode={{ name }} />
-        {/each}
+            <!-- <AddTriggerNodeView>
+              <div class="flex gap-2 items-center">
+                <Plus size="1rem" />
+                Add trigger
+              </div>
+            </AddTriggerNodeView> -->
+          </div>
+        {:else}
+          <!-- DEBUG -->
+          <WebhookTriggerNodeView bind:currentlyActiveNode />
+          <!-- draw line that connects the nodes -->
+          <NodeConnector bind:currentlyActiveNode startNode="input" />
+          {#each Object.keys($pipelineEditingStore.pipeline.nodes) as name}
+            <NodeView bind:currentlyActiveNode nodeName={name} />
+            <NodeConnector bind:currentlyActiveNode startNode={name} />
+          {/each}
+          <pre>{JSON.stringify($pipelineEditingStore.pipeline, null, 2)}</pre>
+        {/if}
       {/if}
-    {/if}
+    </div>
+    <NodeSidebarView bind:currentlyActiveNode />
   </div>
 </GridBackground>

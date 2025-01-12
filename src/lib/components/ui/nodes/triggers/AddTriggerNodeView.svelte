@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
   import AddTriggerSidebar from '../../node-sidebar/AddTriggerSidebar.svelte';
   import BaseNodeView from '../BaseNodeView.svelte';
 
@@ -11,4 +11,4 @@
   {@render children()}
 </BaseNodeView>
 
-<AddTriggerSidebar bind:open={active} />
+ -->
