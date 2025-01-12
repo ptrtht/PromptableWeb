@@ -1,10 +1,10 @@
 <script lang="ts">
   import { SearchIcon, Webhook } from 'lucide-svelte';
-  import { AspectRatio } from '../aspect-ratio';
-  import { Input } from '../input';
-  import H4 from '../text/H4.svelte';
-  import BaseNodeSidebar from './BaseNodeSidebar.svelte';
-  import Paragraph from '../text/Paragraph.svelte';
+  import { AspectRatio } from '../../aspect-ratio';
+  import { Input } from '../../input';
+  import H4 from '../../text/H4.svelte';
+  import BaseNodeSidebar from '../BaseNodeSidebar.svelte';
+  import Paragraph from '../../text/Paragraph.svelte';
   import { toast } from 'svelte-sonner';
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
 

@@ -28,7 +28,7 @@
       <div class={'flex items-center place-content-between gap-2 '}>
         <div class="flex items-center gap-2">
           <Zap size="1rem" fill="currentColor" />
-          <H4>Pipeline trigger</H4>
+          <H4>{$pipelineEditingStore.pipeline.input.name}</H4>
         </div>
         <Badge variant={active ? 'default' : 'outline'} class={active ? 'border-primary-foreground' : ''}>
           Trigger

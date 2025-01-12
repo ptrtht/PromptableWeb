@@ -32,6 +32,7 @@ export const WebhookTriggerConfigSchema = z.object({
   type: z.literal('webhook'),
   validate: z.boolean(),
   schema: z.record(SchemaTypeEnum),
+  name: z.string().optional(),
 });
 
 export const PipelineConfigJsonSchema = z.object({

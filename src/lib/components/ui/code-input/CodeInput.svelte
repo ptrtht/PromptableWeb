@@ -130,7 +130,7 @@
 
 <Dialog.Root bind:open>
   <Dialog.Content class="p-0 flex h-content" closable={false}>
-    <div class="editor-container rounded-md bg-foreground/90 text-muted pt-4 flex-grow">
+    <div class="editor-container rounded-xl bg-foreground/90 text-muted pt-4 flex-grow">
       <Copy
         class="absolute top-2 right-2 cursor-pointer text-accent z-10"
         color="currentColor"

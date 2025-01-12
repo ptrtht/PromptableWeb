@@ -2,16 +2,22 @@
   import { Plus, Trash } from 'lucide-svelte';
   import { Input } from '../input';
   import { Label } from '../label';
+  import * as Select from '$lib/components/ui/select/index.js';
 
   // Make the object prop bindable
   let {
     object = $bindable(),
     disabled = false,
     maxrows,
+    select,
   }: {
     object: Record<string, string> | undefined;
     disabled?: boolean;
     maxrows?: number;
+    select?: {
+      value: string;
+      label: string;
+    }[];
   } = $props();
 
   // Track entries with original keys for proper updates
@@ -26,25 +32,20 @@
 
   // Update key in object - now only called on blur
   function commitKeyUpdate(entry: { originalKey: string; currentKey: string; value: string }) {
-    // Don't update if the key hasn't changed or is empty
     if (entry.currentKey === entry.originalKey || entry.currentKey.trim() === '') {
-      // Reset the current key back to original if empty
       entry.currentKey = entry.originalKey;
       return;
     }
 
-    // Check if the new key would create a duplicate
     const keyExists = Object.keys(object ?? {}).some((key) => key === entry.currentKey && key !== entry.originalKey);
 
     if (keyExists) {
-      // Reset the current key back to original if it would create a duplicate
       entry.currentKey = entry.originalKey;
       return;
     }
 
     const newObject: Record<string, string> = {};
 
-    // Rebuild object with the updated key
     for (const [key, value] of Object.entries(object ?? {})) {
       if (key === entry.originalKey) {
         newObject[entry.currentKey] = value as string;
@@ -53,9 +54,7 @@
       }
     }
 
-    // Update the bound object
     object = newObject;
-    // Update the original key to match the new key
     entry.originalKey = entry.currentKey;
   }
 
@@ -86,7 +85,6 @@
     let newKey = 'newField';
     let counter = 1;
 
-    // Ensure unique key
     while (newKey in (object ?? {})) {
       newKey = `newField${counter}`;
       counter++;
@@ -94,7 +92,8 @@
 
     const newObject = {
       ...object,
-      [newKey]: '',
+      // If select options are provided, use the first option's value as default
+      [newKey]: select ? select[0]?.value ?? '' : '',
     };
 
     object = newObject;
@@ -113,11 +112,13 @@
   </div>
 
   {#if Object.keys(object ?? {}).length === 0}
-    <Label class="text-foreground/50">...</Label>
+    <div class="grid grid-cols-3">
+      <Label class="text-foreground/50">...</Label>
+      <Label class="text-foreground/50">...</Label>
+    </div>
   {/if}
 
   {#each entries as entry (entry.originalKey)}
-    <!-- only render if eitehr max rows is undefined or if the limit has not been reached yet -->
     {#if !maxrows || entry.idx < maxrows}
       <div class="grid grid-cols-3 w-full gap-1">
         <div>
@@ -129,12 +130,31 @@
           />
         </div>
         <div class="col-span-2 flex gap-2 items-center">
-          <Input
-            value={entry.value}
-            oninput={(e) => updateValue(entry.originalKey, e.currentTarget.value)}
-            class="flex-grow"
-            {disabled}
-          />
+          {#if select}
+            <Select.Root
+              value={entry.value}
+              type="single"
+              {disabled}
+            >
+              <Select.Trigger>
+                {select.find((s) => s.value === entry.value)?.label ?? 'Select an option'}
+              </Select.Trigger>
+              <Select.Content>
+                {#each select as option}
+                  <Select.Item value={option.value} onclick={() => updateValue(entry.originalKey, option.value)}>
+                    {option.label}
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          {:else}
+            <Input
+              value={entry.value}
+              oninput={(e) => updateValue(entry.originalKey, e.currentTarget.value)}
+              class="flex-grow"
+              {disabled}
+            />
+          {/if}
           {#if !disabled}
             <Trash
               size="1.2rem"
@@ -146,8 +166,8 @@
       </div>
     {/if}
   {/each}
-  <!-- if limit was placed, show the number of elements hidden -->
+
   {#if maxrows && Object.keys(object ?? {}).length > maxrows}
-        <Label class="text-foreground/50">+{Object.keys(object ?? {}).length - maxrows} more..</Label>
+    <Label class="text-foreground/50">+{Object.keys(object ?? {}).length - maxrows} more..</Label>
   {/if}
 </div>

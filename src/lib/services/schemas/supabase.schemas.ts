@@ -34,28 +34,28 @@ export const jsonSchema: z.ZodSchema<Json> = z.lazy(() =>
 export const publicApiKeysRowSchemaSchema = z.object({
   created_at: z.string(),
   id: z.number(),
-  key: z.string().nullable(),
+  key: z.string(),
   name: z.string().nullable(),
   status: publicApiKeyStatusEnumSchema,
-  user_id: z.string().nullable(),
+  user_id: z.string(),
 });
 
 export const publicApiKeysInsertSchemaSchema = z.object({
   created_at: z.string().optional(),
   id: z.number().optional(),
-  key: z.string().optional().nullable(),
+  key: z.string().optional(),
   name: z.string().optional().nullable(),
   status: publicApiKeyStatusEnumSchema.optional(),
-  user_id: z.string().optional().nullable(),
+  user_id: z.string(),
 });
 
 export const publicApiKeysUpdateSchemaSchema = z.object({
   created_at: z.string().optional(),
   id: z.number().optional(),
-  key: z.string().optional().nullable(),
+  key: z.string().optional(),
   name: z.string().optional().nullable(),
   status: publicApiKeyStatusEnumSchema.optional(),
-  user_id: z.string().optional().nullable(),
+  user_id: z.string().optional(),
 });
 
 export const publicApiKeysRelationshipsSchemaSchema = z.tuple([]);

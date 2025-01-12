@@ -13,26 +13,26 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          key: string | null
+          key: string
           name: string | null
           status: Database["public"]["Enums"]["api_key_status_enum"]
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: number
-          key?: string | null
+          key?: string
           name?: string | null
           status?: Database["public"]["Enums"]["api_key_status_enum"]
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: number
-          key?: string | null
+          key?: string
           name?: string | null
           status?: Database["public"]["Enums"]["api_key_status_enum"]
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

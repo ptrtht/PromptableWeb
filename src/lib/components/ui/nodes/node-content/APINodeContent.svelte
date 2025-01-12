@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Input } from '../input';
-  import { Label } from '../label';
-  import ObjectInput from '../object-input/ObjectInput.svelte';
-  import * as Select from '../select';
+  import { Input } from '../../input';
+  import { Label } from '../../label';
+  import ObjectInput from '../../object-input/ObjectInput.svelte';
+  import * as Select from '../../select';
   import type { NodeConfig } from '$lib/services/schemas/PipelineConfig';
 
   const {

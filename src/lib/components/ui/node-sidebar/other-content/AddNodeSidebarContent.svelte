@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Brain, SearchIcon, Webhook } from 'lucide-svelte';
-  import { AspectRatio } from '../aspect-ratio';
-  import { Input } from '../input';
-  import H4 from '../text/H4.svelte';
-  import Paragraph from '../text/Paragraph.svelte';
+  import { AspectRatio } from '../../aspect-ratio';
+  import { Input } from '../../input';
+  import H4 from '../../text/H4.svelte';
+  import Paragraph from '../../text/Paragraph.svelte';
   import { toast } from 'svelte-sonner';
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
   import { type APINodeInput, APINodeInputSchema } from '$lib/services/schemas/nodes/APINode';

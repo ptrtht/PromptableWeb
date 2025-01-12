@@ -9,7 +9,7 @@
   import { Button } from '../button';
   import * as Popover from '../popover';
   import type { CurrentlyActiveNodeType } from '$lib/components/utils';
-  import APINodeContent from './APINodeContent.svelte';
+  import APINodeContent from './node-content/APINodeContent.svelte';
   
   let {
     currentlyActiveNode = $bindable(),
@@ -47,7 +47,7 @@
   {#snippet header()}
     <div class={cn('flex place-content-between')}>
       <div class="flex items-center gap-2">
-        {#if node?.type === 'api_call'}
+        {#if node?.type === 'api_call' }
           <Webhook size="1.2rem" />
         {:else}
           <Zap fill="currentColor" size="1rem" />

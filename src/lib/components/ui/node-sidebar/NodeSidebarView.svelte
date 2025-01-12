@@ -5,9 +5,10 @@
   import type { CurrentlyActiveNodeType } from '$lib/components/utils';
   import { Button } from '../button';
   import { X } from 'lucide-svelte';
-  import AddNodeSidebarContent from './AddNodeSidebarContent.svelte';
+  import AddNodeSidebarContent from './other-content/AddNodeSidebarContent.svelte';
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
-  import ApiNodeSidebarContent from './APINodeSidebarContent.svelte';
+  import ApiNodeSidebarContent from './node-content/APINodeSidebarContent.svelte';
+  import WebhookTriggerSidebarContent from './other-content/WebhookTriggerSidebarContent.svelte';
 
   let {
     currentlyActiveNode = $bindable(),
@@ -42,6 +43,9 @@
         {:else if node.type === 'llm'}
           <H4>LLM NODE PLACEHOLDER</H4>
         {/if}
+      {/if}
+      {#if currentlyActiveNode === 'input'}
+        <WebhookTriggerSidebarContent />
       {/if}
       {#if currentlyActiveNode === 'addNode'}
         <AddNodeSidebarContent />

@@ -34,7 +34,8 @@
   let renameDialogOpen = $state(false);
   let currentlyActiveNode: null | keyof PipelineConfigJson['nodes'] = $state(
     // DEV
-    '8ce124d7-a284-4d8a-8d18-4568c6c04f76'
+    // '8ce124d7-a284-4d8a-8d18-4568c6c04f76'
+    'input'
   );
 
   const savePipeline = async () => {

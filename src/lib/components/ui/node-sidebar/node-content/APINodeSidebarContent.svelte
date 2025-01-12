@@ -2,13 +2,13 @@
   import * as Select from '$lib/components/ui/select/index.js';
   import { cn, type CurrentlyActiveNodeType } from '$lib/components/utils';
   import { Braces, Code, Hammer, Link2, Play, Plus, TableProperties, Trash } from 'lucide-svelte';
-  import { Label } from '../label';
-  import { Input } from '../input';
+  import { Label } from '../../label';
+  import { Input } from '../../input';
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
-  import ObjectInput from '../object-input/ObjectInput.svelte';
-  import Textarea from '../textarea/textarea.svelte';
+  import ObjectInput from '../../object-input/ObjectInput.svelte';
+  import Textarea from '../../textarea/textarea.svelte';
   import type { APINodeInput } from '$lib/services/schemas/nodes/APINode';
 
   let {
