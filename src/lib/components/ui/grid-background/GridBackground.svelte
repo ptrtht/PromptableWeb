@@ -2,7 +2,7 @@
   const { children } = $props();
 </script>
 
-<div class="relative w-full h-full">
+<div class="relative h-full w-full">
   <!-- Adjust h-64 to your desired height -->
   <!-- Background Grid Layer -->
   <div class="absolute inset-0 bg-background">

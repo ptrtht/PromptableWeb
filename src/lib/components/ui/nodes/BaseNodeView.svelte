@@ -38,7 +38,7 @@
     <Separator class="mb-2" />
   {/if}
   <Card.Content
-    class="flex pt-0 flex-col px-4 gap-1 rounded-xl cursor-pointer"
+    class="flex pt-0 flex-col px-4 gap-4 rounded-xl cursor-pointer"
     onclick={() => {
       // if no cur active node, then set to this node
       if (!currentlyActiveNode) currentlyActiveNode = nodeName;

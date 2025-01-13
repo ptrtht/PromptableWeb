@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CredentialResolverService } from '../CredentialResolverService';
 import { LoggingService } from '../LoggingService';
+import type { ExecutionContext } from '../context/ExecutionContext';
 
 // Schema for node credentials in config
 const NodeCredentialSchema = z.object({
@@ -75,7 +76,7 @@ export abstract class BaseNode {
     return { success: false, error: lastError };
   }
 
-  abstract execute(config: any): Promise<any>;
+  abstract execute(config: any, context: ExecutionContext): Promise<any>;
 
   async validateOutput(output: unknown): Promise<z.SafeParseReturnType<any, any>> {
     return this.outputSchema.safeParse(output);

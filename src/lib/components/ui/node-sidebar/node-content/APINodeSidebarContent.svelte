@@ -74,7 +74,7 @@
     }}
   >
     <Play size="1rem" />
-    <span> Output </span>
+    <span> Run </span>
   </button>
 </div>
 {#if currentlyActiveNode && $pipelineEditingStore?.pipeline.nodes[currentlyActiveNode]?.type === 'api_call'}

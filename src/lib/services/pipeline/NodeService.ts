@@ -5,7 +5,9 @@ import { APINode } from './nodes/APINode';
 export class NodeService {
   private static nodes: Map<string, BaseNode> = new Map<string, BaseNode>([
     ['llm', new LLMNode()],
+    // @deprecated
     ['api', new APINode()],
+    ['api_call', new APINode()],
   ]);
 
   static getNode(type: string): BaseNode {

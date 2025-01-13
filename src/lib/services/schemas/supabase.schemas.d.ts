@@ -12,6 +12,9 @@ export type PublicApiKeyStatusEnum = z.infer<
 export type PublicPipelineResult = z.infer<
   typeof generated.publicPipelineResultSchema
 >;
+export type PublicProvidersEnum = z.infer<
+  typeof generated.publicProvidersEnumSchema
+>;
 export type Json = z.infer<typeof generated.jsonSchema>;
 export type PublicApiKeysRowSchema = z.infer<
   typeof generated.publicApiKeysRowSchemaSchema
@@ -96,4 +99,10 @@ export type PublicVPipelineStatsTotalRowSchema = z.infer<
 >;
 export type PublicVPipelineStatsTotalRelationshipsSchema = z.infer<
   typeof generated.publicVPipelineStatsTotalRelationshipsSchemaSchema
+>;
+export type PublicVPipelineStatsWeeklyRowSchema = z.infer<
+  typeof generated.publicVPipelineStatsWeeklyRowSchemaSchema
+>;
+export type PublicVPipelineStatsWeeklyRelationshipsSchema = z.infer<
+  typeof generated.publicVPipelineStatsWeeklyRelationshipsSchemaSchema
 >;

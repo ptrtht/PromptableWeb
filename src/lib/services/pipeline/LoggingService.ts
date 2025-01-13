@@ -46,6 +46,7 @@ export class LoggingService {
 
   // Helper methods for different log levels
   static async debug(message: string, data?: any): Promise<void> {
+    if (process.env.NODE_ENV === 'production') return;
     return this.log('debug', message, data);
   }
 

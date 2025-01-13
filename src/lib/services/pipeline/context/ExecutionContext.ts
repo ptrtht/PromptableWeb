@@ -51,6 +51,10 @@ export class ExecutionContext {
     return resolver.resolve(key, this);
   }
 
+  getResolver(namespace: string): VariableResolver | undefined {
+    return this.resolvers.get(namespace);
+  }
+
   clear() {
     this.nodeState.clear();
   }

@@ -10,7 +10,7 @@
   import * as Popover from '../popover';
   import type { CurrentlyActiveNodeType } from '$lib/components/utils';
   import APINodeContent from './node-content/APINodeContent.svelte';
-  
+  import LLMNodeContent from './node-content/LLMNodeContent.svelte';
   let {
     currentlyActiveNode = $bindable(),
     nodeName,
@@ -47,7 +47,7 @@
   {#snippet header()}
     <div class={cn('flex place-content-between')}>
       <div class="flex items-center gap-2">
-        {#if node?.type === 'api_call' }
+        {#if node?.type === 'api_call'}
           <Webhook size="1.2rem" />
         {:else}
           <Zap fill="currentColor" size="1rem" />
@@ -57,7 +57,13 @@
         </Paragraph>
       </div>
       <div class="flex gap-2">
-        <Badge variant={active ? 'default' : 'outline'} class={active ? 'border-primary-foreground' : ''}>Output</Badge>
+        <Badge variant={active ? 'default' : 'outline'} class={active ? 'border-primary-foreground' : ''}>
+          {#if node?.type === 'api_call'}
+            API
+          {:else}
+            LLM
+          {/if}
+        </Badge>
         <Popover.Root bind:open={popoverOpen}>
           <Popover.Trigger>
             <Ellipsis />
@@ -88,6 +94,10 @@
   <div class="flex flex-col gap-2 flex-grow text-foreground">
     {#if node?.type === 'api_call'}
       <APINodeContent {node} />
+    {/if}
+
+    {#if node?.type === 'llm'}
+      <LLMNodeContent {node} />
     {/if}
   </div>
 </BaseNodeView>

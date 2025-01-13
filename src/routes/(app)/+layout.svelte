@@ -44,7 +44,7 @@
   });
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider class="max-w-[100vw]">
   <Sidebar.Root collapsible="icon">
     <Sidebar.Header>
       <Sidebar.Menu>

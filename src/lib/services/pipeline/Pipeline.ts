@@ -4,22 +4,40 @@ import { NodeService } from './NodeService';
 import { LoggingService } from './LoggingService';
 import { ExecutionContext } from './context/ExecutionContext';
 import { getNestedValue } from './context/VariableResolver';
+import { type CredentialResolver } from './context/CredentialResolver';
 
 export class Pipeline {
   // Pattern for context variables like {{context.credentials.openai}}
   private static readonly CONTEXT_PATTERN = /\{\{context\.([\w]+)\.([\w\-\.]+)\}\}/g;
-  
+
   // Pattern for node outputs like {{node1.output.data}}
   private static readonly NODE_PATTERN = /\{\{([\w\-]+)\.([\w\-.\[\]]+)\}\}/g;
-  
+
   constructor(
     private config: PipelineConfig,
     private context: ExecutionContext
-  ) {}
+  ) {
+    const credentialResolver = this.context.getResolver('credentials') as CredentialResolver;
+    if (credentialResolver) {
+      credentialResolver.setCredentials(this.context);
+    } else {
+      throw new Error('Credential resolver not found in context');
+    }
+  }
+
+  async initialize() {
+    // Initialize credentials
+    const credentialResolver = this.context.getResolver('credentials') as CredentialResolver;
+    if (credentialResolver) {
+      await credentialResolver.setCredentials(this.context);
+    } else {
+      throw new Error('Credential resolver not found in context');
+    }
+  }
 
   private getNodeValue(path: string): any {
     const [nodeId, ...pathParts] = path.split('.');
-    
+
     const nodeOutput = this.context.getNodeOutput(nodeId);
     if (!nodeOutput) {
       throw new Error(`Node ${nodeId} output not found`);
@@ -35,7 +53,7 @@ export class Pipeline {
 
   private async resolveVariablesDeep(obj: any): Promise<any> {
     if (Array.isArray(obj)) {
-      return Promise.all(obj.map(item => this.resolveVariablesDeep(item)));
+      return Promise.all(obj.map((item) => this.resolveVariablesDeep(item)));
     }
 
     if (obj !== null && typeof obj === 'object') {
@@ -68,10 +86,7 @@ export class Pipeline {
         const [fullMatch, nodeId, path] = match;
         try {
           const value = this.getNodeValue(`${nodeId}.${path}`);
-          resolvedString = resolvedString.replace(
-            fullMatch, 
-            typeof value === 'string' ? value : JSON.stringify(value)
-          );
+          resolvedString = resolvedString.replace(fullMatch, typeof value === 'string' ? value : JSON.stringify(value));
         } catch (error) {
           LoggingService.error('Node output resolution failed', { nodeId, path, error });
           throw error;
@@ -96,27 +111,17 @@ export class Pipeline {
         await LoggingService.log('info', `Executing node ${nodeId}`, { type: nodeConfig.type });
 
         // Resolve variables in config
-        const resolvedConfig = {
-          ...(await this.resolveVariablesDeep(nodeConfig.config)),
-          credentials: nodeConfig.credentials,
-        };
+        const resolvedConfig = await this.resolveVariablesDeep(nodeConfig.config);
+        LoggingService.debug('Resolved node config', resolvedConfig);
 
         // Execute node
-        const result = await node.execute(resolvedConfig);
+        const result = await node.execute(resolvedConfig, this.context);
         await LoggingService.log('debug', `Node ${nodeId} execution result`, result);
 
         if (!result.success) {
           await LoggingService.log('error', `Execution failed for node ${nodeId}, result: `, result);
           this.context.setNodeState(nodeId, resolvedConfig, null, 'error');
           throw result.error;
-        }
-
-        // Validate output
-        const outputValidation = await node.validateOutput(result.data);
-        if (!outputValidation.success) {
-          await LoggingService.log('error', `Output validation failed for node ${nodeId}`, outputValidation.error);
-          this.context.setNodeState(nodeId, resolvedConfig, null, 'error');
-          throw new Error(`Output validation failed for node ${nodeId}`);
         }
 
         // Store result with input

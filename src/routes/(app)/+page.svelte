@@ -23,6 +23,8 @@
   import ProviderCard from '$lib/components/ui/provider-card/ProviderCard.svelte';
   import { getUserName } from '$lib/utils/utils';
   import PipelineTemplateCard from '$lib/components/ui/pipeline-template-card/PipelineTemplateCard.svelte';
+  import { PipelineStore } from '$lib/services/stores/PipelineStore';
+  import PulseSpinner from '$lib/components/ui/spinners/PulseSpinner.svelte';
 
   let user: User | null = $state(null);
 
@@ -32,8 +34,65 @@
     data: PageData;
   } = $props();
 
+  let pipelineWeeklyStats: {
+    runs: {
+      this_week: number;
+      last_week: number;
+    };
+    error_rate: {
+      this_week: number;
+      last_week: number;
+    };
+  } | null = $state(null);
+
+  let pipelineErrorDeltaPercentage = $derived(() => {
+    if (pipelineWeeklyStats) {
+      // ((this_week - last_week) / last_week) * 100
+      return (
+        ((pipelineWeeklyStats.error_rate.this_week - pipelineWeeklyStats.error_rate.last_week) /
+          pipelineWeeklyStats.error_rate.last_week) *
+        100
+      );
+    }
+    return 0;
+  });
+
+  let pipelineRunsDeltaPercentage = $derived(() => {
+    if (pipelineWeeklyStats) {
+      return (
+        ((pipelineWeeklyStats.runs.this_week - pipelineWeeklyStats.runs.last_week) /
+          pipelineWeeklyStats.runs.last_week) *
+        100
+      );
+    }
+    return 0;
+  });
+
   onMount(async () => {
     user = await UsersStore.getCurrentUser();
+
+    const weeklyStats = await PipelineStore.getPipelinesWithWeeklyStats();
+
+    // aggregate all pipelines
+    pipelineWeeklyStats = weeklyStats.reduce(
+      (acc, curr) => {
+        acc.runs.this_week += curr.total_runs ?? 0;
+        acc.runs.last_week += curr.last_week_total_runs ?? 0;
+        acc.error_rate.this_week += curr.error_rate ?? 0;
+        acc.error_rate.last_week += curr.last_week_error_rate ?? 0;
+        return acc;
+      },
+      {
+        runs: {
+          this_week: 0,
+          last_week: 0,
+        },
+        error_rate: {
+          this_week: 0,
+          last_week: 0,
+        },
+      }
+    );
 
     LoggingService.debug('user_metadata', user.user_metadata);
   });
@@ -50,21 +109,59 @@
       <Card.Root class="flex-grow min-w-xs">
         <Card.Content>
           <div class="flex place-content-between mb-2">
-            <H4>Runs this week</H4>
+            <H4>Error rate this week</H4>
             <CirclePlay />
           </div>
-          <H1>444</H1>
-          <Paragraph variant="muted">+10% from last week</Paragraph>
+          <H1>
+            {#if pipelineWeeklyStats}
+              {pipelineWeeklyStats?.error_rate.this_week}%
+            {:else}
+              <PulseSpinner class="h-8" />
+            {/if}
+          </H1>
+          <Paragraph variant="muted">
+            {#if pipelineWeeklyStats}
+              <!-- calc and display the % from the delta -->
+              <!-- the delta is the difference in cnt from last week, not a percentage -->
+              {@const change = pipelineErrorDeltaPercentage()}
+              {#if change > 0}
+                Up <span class="">{change}%</span> from last week
+              {:else if change < 0}
+                Down <span class="">{Math.abs(change)}%</span> from last week
+              {/if}
+            {:else}
+              ...
+            {/if}
+          </Paragraph>
         </Card.Content>
       </Card.Root>
       <Card.Root class="flex-grow min-w-xs">
         <Card.Content>
           <div class="flex place-content-between mb-2">
-            <H4>Error rate this week</H4>
+            <H4>Runs this week</H4>
             <CirclePercent />
           </div>
-          <H1>1.2 %</H1>
-          <Paragraph variant="muted">Down 7% from last week</Paragraph>
+          <H1>
+            {#if pipelineWeeklyStats}
+              {pipelineWeeklyStats?.runs.this_week}
+            {:else}
+              <PulseSpinner class="h-8" />
+            {/if}
+          </H1>
+          <Paragraph variant="muted">
+            {#if pipelineWeeklyStats}
+              <!-- calc and display the % from the delta -->
+              <!-- the delta is the difference in cnt from last week, not a percentage -->
+              {@const change = pipelineRunsDeltaPercentage()}
+              {#if change > 0}
+                Up <span class="">{change}%</span> from last week
+              {:else if change < 0}
+                Down <span class="">{Math.abs(change)}%</span> from last week
+              {/if}
+            {:else}
+              ...
+            {/if}
+          </Paragraph>
         </Card.Content>
       </Card.Root>
       <Card.Root class="flex-grow bg-card-foreground min-w-xs">

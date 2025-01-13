@@ -31,6 +31,17 @@ export class PipelineStore {
     return data;
   }
 
+  static async getPipelinesWithWeeklyStats(): Promise<Views['v_pipeline_stats_weekly']['Row'][]> {
+    const user = await UsersStore.getCurrentUser();
+
+    // ? There is no RLS on this view need to manually filter for users.
+    const { data, error } = await supabase.from('v_pipeline_stats_weekly').select('*').eq('user_id', user.id);
+    if (error) {
+      throw LoggingService.error('Error getting pipelines with weekly stats', error);
+    }
+    return data;
+  }
+
   static async createNewPipeline(): Promise<Tables['pipelines']['Row']> {
     const user = await UsersStore.getCurrentUser();
 

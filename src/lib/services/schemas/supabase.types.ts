@@ -82,6 +82,13 @@ export type Database = {
             referencedRelation: "v_pipeline_stats_total"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pipeline_runs_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "v_pipeline_stats_weekly"
+            referencedColumns: ["id"]
+          },
         ]
       }
       pipelines: {
@@ -145,7 +152,7 @@ export type Database = {
           id: number
           link: string
           logo_url: string
-          name: string
+          name: Database["public"]["Enums"]["providers_enum"]
         }
         Insert: {
           created_at?: string
@@ -153,7 +160,7 @@ export type Database = {
           id?: number
           link: string
           logo_url: string
-          name: string
+          name: Database["public"]["Enums"]["providers_enum"]
         }
         Update: {
           created_at?: string
@@ -161,7 +168,7 @@ export type Database = {
           id?: number
           link?: string
           logo_url?: string
-          name?: string
+          name?: Database["public"]["Enums"]["providers_enum"]
         }
         Relationships: []
       }
@@ -224,6 +231,24 @@ export type Database = {
         }
         Relationships: []
       }
+      v_pipeline_stats_weekly: {
+        Row: {
+          created_at: string | null
+          error_rate: number | null
+          id: string | null
+          last_week_error_rate: number | null
+          last_week_price_per_run: number | null
+          last_week_total_runs: number | null
+          modified_at: string | null
+          name: string | null
+          price_per_run: number | null
+          status: string | null
+          total_runs: number | null
+          user_id: string | null
+          version: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
@@ -231,6 +256,7 @@ export type Database = {
     Enums: {
       api_key_status_enum: "active" | "revoked" | "deleted"
       pipeline_result: "Success" | "Fail" | "Warn"
+      providers_enum: "OpenAI" | "Anthropic" | "Grok"
     }
     CompositeTypes: {
       [_ in never]: never

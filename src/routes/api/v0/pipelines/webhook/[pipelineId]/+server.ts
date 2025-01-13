@@ -9,11 +9,12 @@ import { VirtualKeyService } from '$lib/services/pipeline/VirtualKeyService';
 import { PipelineServerStore } from '$lib/services/stores/PipelineStore.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { PipelineRunsServerStore } from '$lib/services/stores/PipelineRunsStore.server';
+import { UserResolver } from '$lib/services/pipeline/context/UserResolver';
 
 export const POST = (async ({ request, params }) => {
   const webhookPayload = await request.json();
   const pipelineId = params.pipelineId;
-  let version: number = -1
+  let version: number = -1;
 
   if (!pipelineId) {
     LoggingService.error('Pipeline ID not provided');
@@ -36,18 +37,20 @@ export const POST = (async ({ request, params }) => {
     const pipelineConfig = await PipelineServerStore.getPipeline(pipelineId);
     version = pipelineConfig.version;
 
-    // Setup context with both resolvers
+    // Setup context with all resolvers
     const credentialResolver = new CredentialResolver(VirtualKeyService);
     const inputResolver = new InputResolver(webhookPayload);
-    const context = new ExecutionContext([credentialResolver, inputResolver]);
+    const userResolver = new UserResolver(pipelineConfig.user_id);
+    const context = new ExecutionContext([credentialResolver, inputResolver, userResolver]);
 
     // Create and execute pipeline
     const pipeline = new Pipeline(pipelineConfig, context);
+    await pipeline.initialize(); // Initialize credentials asynchronously
     const result = await pipeline.execute();
 
     if (!result.success) {
       console.error('Pipeline execution failed:', result.error);
-      throw new Error('Pipeline execution failed', result.error);
+      throw new Error('Pipeline execution failed: ' + JSON.stringify(result.error));
     }
 
     await PipelineRunsServerStore.addPipelineRun({
@@ -56,7 +59,7 @@ export const POST = (async ({ request, params }) => {
       log: result.state,
       result: 'Success',
       version: pipelineConfig.version,
-      price: 0
+      price: 0,
     });
 
     return new Response(JSON.stringify(result), {
@@ -75,7 +78,7 @@ export const POST = (async ({ request, params }) => {
         log: { error: error?.message },
         result: 'Fail',
         price: 0,
-        version: version
+        version: version,
       });
     } catch (error: any) {
       await LoggingService.error('Failed to save pipeline run', {

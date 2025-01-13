@@ -19,6 +19,12 @@ export const publicPipelineResultSchema = z.union([
   z.literal("Warn"),
 ]);
 
+export const publicProvidersEnumSchema = z.union([
+  z.literal("OpenAI"),
+  z.literal("Anthropic"),
+  z.literal("Grok"),
+]);
+
 export const jsonSchema: z.ZodSchema<Json> = z.lazy(() =>
   z
     .union([
@@ -108,6 +114,13 @@ export const publicPipelineRunsRelationshipsSchemaSchema = z.tuple([
     referencedRelation: z.literal("v_pipeline_stats_total"),
     referencedColumns: z.tuple([z.literal("id")]),
   }),
+  z.object({
+    foreignKeyName: z.literal("pipeline_runs_pipeline_id_fkey"),
+    columns: z.tuple([z.literal("pipeline_id")]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal("v_pipeline_stats_weekly"),
+    referencedColumns: z.tuple([z.literal("id")]),
+  }),
 ]);
 
 export const publicPipelinesRowSchemaSchema = z.object({
@@ -174,7 +187,7 @@ export const publicProvidersRowSchemaSchema = z.object({
   id: z.number(),
   link: z.string(),
   logo_url: z.string(),
-  name: z.string(),
+  name: publicProvidersEnumSchema,
 });
 
 export const publicProvidersInsertSchemaSchema = z.object({
@@ -183,7 +196,7 @@ export const publicProvidersInsertSchemaSchema = z.object({
   id: z.number().optional(),
   link: z.string(),
   logo_url: z.string(),
-  name: z.string(),
+  name: publicProvidersEnumSchema,
 });
 
 export const publicProvidersUpdateSchemaSchema = z.object({
@@ -192,7 +205,7 @@ export const publicProvidersUpdateSchemaSchema = z.object({
   id: z.number().optional(),
   link: z.string().optional(),
   logo_url: z.string().optional(),
-  name: z.string().optional(),
+  name: publicProvidersEnumSchema.optional(),
 });
 
 export const publicProvidersRelationshipsSchemaSchema = z.tuple([]);
@@ -255,3 +268,21 @@ export const publicVPipelineStatsTotalRowSchemaSchema = z.object({
 });
 
 export const publicVPipelineStatsTotalRelationshipsSchemaSchema = z.tuple([]);
+
+export const publicVPipelineStatsWeeklyRowSchemaSchema = z.object({
+  created_at: z.string().nullable(),
+  error_rate: z.number().nullable(),
+  id: z.string().nullable(),
+  last_week_error_rate: z.number().nullable(),
+  last_week_price_per_run: z.number().nullable(),
+  last_week_total_runs: z.number().nullable(),
+  modified_at: z.string().nullable(),
+  name: z.string().nullable(),
+  price_per_run: z.number().nullable(),
+  status: z.string().nullable(),
+  total_runs: z.number().nullable(),
+  user_id: z.string().nullable(),
+  version: z.number().nullable(),
+});
+
+export const publicVPipelineStatsWeeklyRelationshipsSchemaSchema = z.tuple([]);

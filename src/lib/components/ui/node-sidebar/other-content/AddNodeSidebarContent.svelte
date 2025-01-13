@@ -8,20 +8,58 @@
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
   import { type APINodeInput, APINodeInputSchema } from '$lib/services/schemas/nodes/APINode';
   import { type LLMNodeInput, LLMNodeInputSchema } from '$lib/services/schemas/nodes/LLMNode';
+  import { UsersStore } from '$lib/services/stores/UsersStore';
+  import { onMount } from 'svelte';
+  import type { User } from '@supabase/supabase-js';
+
+  let user: User | null = null;
+
+  let {
+    startNode,
+  }: {
+    startNode?: string;
+  } = $props();
+
+  onMount(async () => {
+    user = await UsersStore.getCurrentUser();
+    if (!user) {
+      toast.error('User not found');
+      throw new Error('User not found');
+    }
+  });
+
+  const addToCorrectExecutionOrder = (newKey: string) => {
+    if (!startNode) return;
+    // current exec order
+    const order = $pipelineEditingStore?.pipeline.executionOrder ?? [];
+
+    // get the index of the start node
+    const index = order.indexOf(startNode);
+
+    // add the newkey to the index + 1
+    order.splice(index + 1, 0, newKey);
+
+    // update the pipeline
+    pipelineEditingStore.update((store) => {
+      if (store) {
+        store.pipeline.executionOrder = order;
+      }
+      return store;
+    });
+  };
 
   const handleLLMNode = () => {
     // we just need to add a new entry to the pipelines.nodes, and another component will take care of the execution order.
-
     if (!$pipelineEditingStore) return toast.error('Pipeline not found');
     pipelineEditingStore.update((store) => {
-      if (store) {
+      if (store && user) {
         const nodes = $pipelineEditingStore.pipeline.nodes;
 
         // LLM Base Config:
         const config: LLMNodeInput = LLMNodeInputSchema.parse({
-          model: 'openai/gpt-4o',
+          model: 'openai/gpt-4o-mini',
+          userId: user.id,
           messages: [],
-          credentials: [],
         });
 
         const nodeName = crypto.randomUUID();
@@ -34,6 +72,8 @@
             config,
           },
         };
+
+        addToCorrectExecutionOrder(nodeName);
       }
       return store;
     });
@@ -61,12 +101,13 @@
             config,
           },
         };
+
+        addToCorrectExecutionOrder(nodeName);
       }
       return store;
     });
   };
 </script>
-
 
 <div class="relative h-10 w-full">
   <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 p-1" />

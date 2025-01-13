@@ -9,11 +9,15 @@
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
   import ApiNodeSidebarContent from './node-content/APINodeSidebarContent.svelte';
   import WebhookTriggerSidebarContent from './other-content/WebhookTriggerSidebarContent.svelte';
+  import LlmNodeSidebarContent from './node-content/LLMNodeSidebarContent.svelte';
+  import { LoggingService } from '$lib/services/pipeline/LoggingService';
 
   let {
     currentlyActiveNode = $bindable(),
+    startNode
   }: {
     currentlyActiveNode: CurrentlyActiveNodeType;
+    startNode?: string
   } = $props();
 
   let node = $derived(
@@ -21,6 +25,13 @@
       ? $pipelineEditingStore?.pipeline.nodes[currentlyActiveNode]
       : null
   );
+
+  $effect(() => {
+    LoggingService.debug('startNode', startNode); 
+  });
+
+
+
 </script>
 
 <BaseNodeSidebar bind:currentlyActiveNode>
@@ -41,14 +52,14 @@
         {#if node.type === 'api_call'}
           <ApiNodeSidebarContent bind:currentlyActiveNode />
         {:else if node.type === 'llm'}
-          <H4>LLM NODE PLACEHOLDER</H4>
+          <LlmNodeSidebarContent bind:currentlyActiveNode />
         {/if}
       {/if}
       {#if currentlyActiveNode === 'input'}
         <WebhookTriggerSidebarContent />
       {/if}
       {#if currentlyActiveNode === 'addNode'}
-        <AddNodeSidebarContent />
+        <AddNodeSidebarContent {startNode} />
       {/if}
     {/if}
   </div>
