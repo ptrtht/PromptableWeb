@@ -58,7 +58,9 @@ export class LoggingService {
     return this.log('warn', message, data);
   }
 
-  static async error(message: string, data?: any): Promise<void> {
-    return this.log('error', message, data);
+  static error(message: string, data?: any): string {
+    this.log('error', message, data);
+
+    return `error: ${message} | \n ${JSON.stringify(data)}`;
   }
 }

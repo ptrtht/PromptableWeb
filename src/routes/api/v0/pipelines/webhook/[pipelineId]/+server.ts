@@ -50,7 +50,7 @@ export const POST = (async ({ request, params }) => {
 
     if (!result.success) {
       console.error('Pipeline execution failed:', result.error);
-      throw new Error('Pipeline execution failed: ' + JSON.stringify(result.error));
+      throw new Error('Pipeline execution failed: ' + JSON.stringify(result));
     }
 
     await PipelineRunsServerStore.addPipelineRun({

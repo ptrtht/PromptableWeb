@@ -8,8 +8,8 @@ export const APINodeInputSchema = z
     queryParams: z.record(z.string()).optional(),
 
     // payloads
-    // raw
-    body: z.unknown().optional(),
+    // raw body
+    body: z.string().optional(),
     // form data
     formData: z.record(z.string()).optional(),
     // url encoded

@@ -75,8 +75,7 @@ export class Pipeline {
           const value = await this.context.resolveVariable(namespace, key);
           resolvedString = resolvedString.replace(fullMatch, value);
         } catch (error) {
-          LoggingService.error('Context variable resolution failed', { namespace, key, error });
-          throw error;
+          throw LoggingService.error('Context variable resolution failed', { namespace, key, error });
         }
       }
 

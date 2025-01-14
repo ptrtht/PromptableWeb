@@ -18,7 +18,10 @@ export class APINode extends BaseNode {
     if (config.method !== 'GET') {
       // Handle mutually exclusive payloads
       if (config.body !== undefined) {
-        init.body = JSON.stringify(config.body);
+        const body = typeof config.body === 'string' ? JSON.parse(config.body) : config.body;
+        init.body = JSON.stringify(body);
+
+        LoggingService.debug('request body', init.body);
         // Ensure content-type is set for JSON
         init.headers = {
           'Content-Type': 'application/json',

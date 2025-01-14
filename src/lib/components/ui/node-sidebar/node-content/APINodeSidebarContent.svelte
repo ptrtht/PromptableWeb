@@ -22,20 +22,20 @@
 
   const onJsonSelect = () => {
     if (!$pipelineEditingStore || !currentlyActiveNode) return toast.error('Pipeline not found');
-    ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formData = {};
-    ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formUrlEncoded = {};
+    delete ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formData;
+    delete ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formUrlEncoded;
   };
 
   const onFormSelect = () => {
     if (!$pipelineEditingStore || !currentlyActiveNode) return toast.error('Pipeline not found');
-    ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).body = '';
-    ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formUrlEncoded = {};
+    delete ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).body;
+    delete ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formUrlEncoded;
   };
 
   const onUrlEncodedSelect = () => {
     if (!$pipelineEditingStore || !currentlyActiveNode) return toast.error('Pipeline not found');
-    ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).body = '';
-    ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formData = {};
+    delete ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).body;
+    delete ($pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config as APINodeInput).formData;
   };
 
   onMount(() => {
@@ -115,7 +115,7 @@
           <ObjectInput bind:object={$pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config.queryParams} />
         </div>
       </div>
-        <Label class="mt-3">Request body</Label>
+      <Label class="mt-3">Request body</Label>
       <div class="flex rounded-xl gap-2 border border-muted">
         <button
           class={cn(
