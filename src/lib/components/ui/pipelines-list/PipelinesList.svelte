@@ -141,7 +141,7 @@
       <Paragraph variant="muted">Create production-ready LLM workflows in minutes</Paragraph>
     </div>
     <div class="flex gap-3">
-      <Button variant="default" onclick={() => {}}>
+      <Button variant="default" href="pipelines/new">
         <span class="flex gap-2 items-center">
           <Hammer />
           <span> Start Building </span>
@@ -160,7 +160,7 @@
       <Paragraph variant="muted">Build your first pipeline now or see an example first</Paragraph>
     </div>
     <div class="flex gap-3 items-center">
-      <Button>Start building</Button>
+      <Button href="pipelines/new">Start building</Button>
       <Button variant="outline">See an example</Button>
     </div>
   </div>

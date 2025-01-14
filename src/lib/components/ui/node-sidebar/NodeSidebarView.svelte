@@ -59,7 +59,7 @@
         <WebhookTriggerSidebarContent />
       {/if}
       {#if currentlyActiveNode === 'addNode'}
-        <AddNodeSidebarContent {startNode} />
+        <AddNodeSidebarContent {startNode} bind:currentlyActiveNode />
       {/if}
     {/if}
   </div>

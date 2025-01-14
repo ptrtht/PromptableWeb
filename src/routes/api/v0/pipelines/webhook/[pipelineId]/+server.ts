@@ -62,10 +62,17 @@ export const POST = (async ({ request, params }) => {
       price: 0,
     });
 
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const lastNode = pipelineConfig.pipeline.executionOrder[pipelineConfig.pipeline.executionOrder.length - 1];
+    return Response.json(
+      {
+        executionData: result,
+        // the last node's output in the pipeline
+        output: result.state[lastNode].output,
+      },
+      {
+        status: 200,
+      }
+    );
   } catch (error: any) {
     await LoggingService.error('Webhook pipeline execution failed', {
       error,

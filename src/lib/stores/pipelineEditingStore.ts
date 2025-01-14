@@ -14,23 +14,23 @@ pipelineEditingStore.subscribe((value) => {
   //? make the vars "safe" -> instead of null values for optional fields, we want to remove them
   // Input
   if (value.pipeline.input.name === null || value.pipeline.input.name === undefined)
-    return delete value.pipeline.input.name;
+    delete value.pipeline.input.name;
 
   // nodes
   Object.entries(value.pipeline.nodes).forEach(([key, node]) => {
     // for text values, if empty, remove them
-    if (!node.name) return delete node.name;
+    if (!node.name) delete node.name;
 
     // nodes -> LLMNode
     if (node.type === 'llm') {
       // for number values we have to check explicitly
       if (node.config.frequency_penalty === null || node.config.frequency_penalty === undefined)
-        return delete node.config.frequency_penalty;
+        delete node.config.frequency_penalty;
 
-      if (node.config.max_tokens === null || node.config.max_tokens === undefined) return delete node.config.max_tokens;
+      if (node.config.max_tokens === null || node.config.max_tokens === undefined) delete node.config.max_tokens;
 
       if (node.config.presence_penalty === null || node.config.presence_penalty === undefined)
-        return delete node.config.presence_penalty;
+        delete node.config.presence_penalty;
 
       // for arrays we have to check if they are empty
       if (
@@ -38,25 +38,24 @@ pipelineEditingStore.subscribe((value) => {
         node.config.stop_sequences === undefined ||
         node.config.stop_sequences.length === 0
       )
-        return delete node.config.stop_sequences;
+        delete node.config.stop_sequences;
 
-      if (!node.config.system) return delete node.config.system;
+      if (!node.config.system) delete node.config.system;
 
-      if (node.config.temperature === null || node.config.temperature === undefined)
-        return delete node.config.temperature;
+      if (node.config.temperature === null || node.config.temperature === undefined) delete node.config.temperature;
 
-      if (node.config.top_k === null || node.config.top_k === undefined) return delete node.config.top_k;
+      if (node.config.top_k === null || node.config.top_k === undefined) delete node.config.top_k;
 
-      if (node.config.top_p === null || node.config.top_p === undefined) return delete node.config.top_p;
+      if (node.config.top_p === null || node.config.top_p === undefined) delete node.config.top_p;
     }
 
     // nodes -> apiNode
     if (node.type === 'api_call') {
-      if (!node.config.body) return delete node.config.body;
-      if (!node.config.formData) return delete node.config.formData;
-      if (!node.config.formUrlEncoded) return delete node.config.formUrlEncoded;
-      if (!node.config.headers) return delete node.config.headers;
-      if (!node.config.queryParams) return delete node.config.queryParams;
+      if (!node.config.body) delete node.config.body;
+      if (!node.config.formData) delete node.config.formData;
+      if (!node.config.formUrlEncoded) delete node.config.formUrlEncoded;
+      if (!node.config.headers) delete node.config.headers;
+      if (!node.config.queryParams) delete node.config.queryParams;
     }
   });
 
@@ -68,7 +67,10 @@ pipelineEditingStore.subscribe((value) => {
 
 const throttledSave = throttle(
   async (id: string, pipeline: PipelineConfigJson) => {
-    LoggingService.debug('Saving pipeline');
+    LoggingService.debug('Saving pipeline', {
+      id,
+      pipeline,
+    });
     await PipelineStore.updatePipelineJson(id, pipeline);
     LoggingService.debug('Pipeline saved');
   },

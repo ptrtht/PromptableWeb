@@ -114,7 +114,7 @@
           </div>
           <H1>
             {#if pipelineWeeklyStats}
-              {pipelineWeeklyStats?.error_rate.this_week}%
+              {pipelineWeeklyStats?.error_rate.this_week.toFixed(2)}%
             {:else}
               <PulseSpinner class="h-8" />
             {/if}
@@ -125,9 +125,9 @@
               <!-- the delta is the difference in cnt from last week, not a percentage -->
               {@const change = pipelineErrorDeltaPercentage()}
               {#if change > 0}
-                Up <span class="">{change}%</span> from last week
+                Up <span class="">{change.toFixed(2)}%</span> from last week
               {:else if change < 0}
-                Down <span class="">{Math.abs(change)}%</span> from last week
+                Down <span class="">{Math.abs(change).toFixed(2)}%</span> from last week
               {/if}
             {:else}
               ...
@@ -154,9 +154,9 @@
               <!-- the delta is the difference in cnt from last week, not a percentage -->
               {@const change = pipelineRunsDeltaPercentage()}
               {#if change > 0}
-                Up <span class="">{change}%</span> from last week
+                Up <span class="">{change.toFixed(2)}%</span> from last week
               {:else if change < 0}
-                Down <span class="">{Math.abs(change)}%</span> from last week
+                Down <span class="">{Math.abs(change).toFixed(2)}%</span> from last week
               {/if}
             {:else}
               ...

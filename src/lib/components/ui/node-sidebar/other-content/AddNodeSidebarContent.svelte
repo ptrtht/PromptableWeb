@@ -11,12 +11,15 @@
   import { UsersStore } from '$lib/services/stores/UsersStore';
   import { onMount } from 'svelte';
   import type { User } from '@supabase/supabase-js';
+  import type { CurrentlyActiveNodeType } from '$lib/components/utils';
 
   let user: User | null = null;
 
   let {
+    currentlyActiveNode = $bindable(),
     startNode,
   }: {
+    currentlyActiveNode: CurrentlyActiveNodeType;
     startNode?: string;
   } = $props();
 
@@ -46,6 +49,8 @@
       }
       return store;
     });
+
+    currentlyActiveNode = null;
   };
 
   const handleLLMNode = () => {
@@ -77,6 +82,7 @@
       }
       return store;
     });
+    currentlyActiveNode = null;
   };
 
   const handleAPICallNode = () => {
