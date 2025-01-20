@@ -1,7 +1,5 @@
 <script lang="ts">
-  import type { PipelineConfigJson } from '$lib/services/schemas/PipelineConfig';
   import BaseNodeSidebar from './BaseNodeSidebar.svelte';
-  import H4 from '../text/H4.svelte';
   import type { CurrentlyActiveNodeType } from '$lib/components/utils';
   import { Button } from '../button';
   import { X } from 'lucide-svelte';
@@ -29,19 +27,10 @@
   $effect(() => {
     LoggingService.debug('startNode', startNode); 
   });
-
-
-
 </script>
 
 <BaseNodeSidebar bind:currentlyActiveNode>
-  <div class="flex place-content-between items-center">
-    {#if currentlyActiveNode === 'addNode'}
-      <H4>Add a node</H4>
-    {:else if node}
-      <span></span>
-    {/if}
-
+  <div class="flex justify-end items-center">
     <Button variant="ghost" onclick={() => (currentlyActiveNode = null)}>
       <X />
     </Button>

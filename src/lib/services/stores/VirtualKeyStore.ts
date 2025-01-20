@@ -15,11 +15,15 @@ export class VirtualKeyStore {
   }
 
   static async setKeyForProvider(params: { provider: string; key: string }) {
-    const { error } = await supabase.from('virtual_keys').update({ key: params.key }).eq('provider', params.provider);
-    //   .eq('user_id', auth.user().id);
+    try {
+      // first we need to check if the key already exists
+      await VirtualKeyStore.getKeyForProvider({ provider: params.provider });
 
-    if (error) {
-      throw new Error('Error setting virtual key');
+      // if that doesn't throw an error, we can update the key
+      const { error } = await supabase.from('virtual_keys').update({ key: params.key }).eq('provider', params.provider);
+    } catch (error) {
+      // if the key doesn't exist, we need to create it
+      await this.createVirtualKey({ provider: params.provider, key: params.key });
     }
   }
 

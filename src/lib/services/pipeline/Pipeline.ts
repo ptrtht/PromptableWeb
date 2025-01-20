@@ -6,6 +6,18 @@ import { ExecutionContext } from './context/ExecutionContext';
 import { getNestedValue } from './context/VariableResolver';
 import { type CredentialResolver } from './context/CredentialResolver';
 
+export type PipelineExecutionParams = {
+  initialState?: {
+    [nodeId: string]: {
+      input: any;
+      output: any;
+      timestamp: number;
+      status: 'completed' | 'error';
+    };
+  };
+  untilNodeId?: string;
+};
+
 export class Pipeline {
   // Pattern for context variables like {{context.credentials.openai}}
   private static readonly CONTEXT_PATTERN = /\{\{context\.([\w]+)\.([\w\-\.]+)\}\}/g;
@@ -98,9 +110,27 @@ export class Pipeline {
     return obj;
   }
 
-  async execute(): Promise<{ success: boolean; state: any; error?: Error }> {
+  async execute(
+    params: PipelineExecutionParams = {}
+  ): Promise<{ success: boolean; state: any; error?: Error; price: number }> {
+    let price = 0;
+
     try {
+      // Initialize context with provided state if any
+      if (params.initialState) {
+        for (const [nodeId, state] of Object.entries(params.initialState)) {
+          this.context.setNodeState(nodeId, state.input, state.output, state.status);
+        }
+      }
+
       for (const nodeId of this.config.pipeline.executionOrder) {
+        // Check if node has already been executed successfully
+        const existingStatus = this.context.getNodeStatus(nodeId);
+        if (existingStatus === 'completed') {
+          await LoggingService.log('info', `Skipping already executed node ${nodeId}`);
+          continue;
+        }
+
         const nodeConfig = this.config.pipeline.nodes[nodeId];
         if (!nodeConfig) {
           throw new Error(`Node ${nodeId} not found in pipeline configuration`);
@@ -123,23 +153,33 @@ export class Pipeline {
           throw result.error;
         }
 
+        price += result?.data?.usage?.total_cost ?? 0;
+
         // Store result with input
         this.context.setNodeState(nodeId, resolvedConfig, result.data);
         await LoggingService.log('info', `Node ${nodeId} completed`, {
           input: resolvedConfig,
           output: result.data,
         });
+
+        // Check if we should stop execution
+        if (params.untilNodeId && nodeId === params.untilNodeId) {
+          await LoggingService.log('info', `Stopping execution at requested node ${nodeId}`);
+          break;
+        }
       }
 
       return {
         success: true,
         state: this.context.getAllState(),
+        price,
       };
     } catch (error: any) {
       return {
         success: false,
         state: this.context.getAllState(),
         error,
+        price,
       };
     }
   }

@@ -66,8 +66,57 @@ export const publicApiKeysUpdateSchemaSchema = z.object({
 
 export const publicApiKeysRelationshipsSchemaSchema = z.tuple([]);
 
+export const publicPipelineDraftsRowSchemaSchema = z.object({
+  created_at: z.string(),
+  id: z.number(),
+  pipeline: jsonSchema,
+  pipeline_id: z.string(),
+  version: z.number(),
+});
+
+export const publicPipelineDraftsInsertSchemaSchema = z.object({
+  created_at: z.string().optional(),
+  id: z.number().optional(),
+  pipeline: jsonSchema,
+  pipeline_id: z.string(),
+  version: z.number(),
+});
+
+export const publicPipelineDraftsUpdateSchemaSchema = z.object({
+  created_at: z.string().optional(),
+  id: z.number().optional(),
+  pipeline: jsonSchema.optional(),
+  pipeline_id: z.string().optional(),
+  version: z.number().optional(),
+});
+
+export const publicPipelineDraftsRelationshipsSchemaSchema = z.tuple([
+  z.object({
+    foreignKeyName: z.literal("pipeline_drafts_pipeline_id_fkey"),
+    columns: z.tuple([z.literal("pipeline_id")]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal("pipelines"),
+    referencedColumns: z.tuple([z.literal("id")]),
+  }),
+  z.object({
+    foreignKeyName: z.literal("pipeline_drafts_pipeline_id_fkey"),
+    columns: z.tuple([z.literal("pipeline_id")]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal("v_pipeline_stats_total"),
+    referencedColumns: z.tuple([z.literal("id")]),
+  }),
+  z.object({
+    foreignKeyName: z.literal("pipeline_drafts_pipeline_id_fkey"),
+    columns: z.tuple([z.literal("pipeline_id")]),
+    isOneToOne: z.literal(false),
+    referencedRelation: z.literal("v_pipeline_stats_weekly"),
+    referencedColumns: z.tuple([z.literal("id")]),
+  }),
+]);
+
 export const publicPipelineRunsRowSchemaSchema = z.object({
   created_at: z.string(),
+  environment: z.string(),
   id: z.number(),
   input: jsonSchema.nullable(),
   log: jsonSchema,
@@ -79,17 +128,19 @@ export const publicPipelineRunsRowSchemaSchema = z.object({
 
 export const publicPipelineRunsInsertSchemaSchema = z.object({
   created_at: z.string().optional(),
+  environment: z.string().optional(),
   id: z.number().optional(),
   input: jsonSchema.optional().nullable(),
   log: jsonSchema,
   pipeline_id: z.string(),
-  price: z.number(),
+  price: z.number().optional(),
   result: publicPipelineResultSchema,
   version: z.number(),
 });
 
 export const publicPipelineRunsUpdateSchemaSchema = z.object({
   created_at: z.string().optional(),
+  environment: z.string().optional(),
   id: z.number().optional(),
   input: jsonSchema.optional().nullable(),
   log: jsonSchema.optional(),

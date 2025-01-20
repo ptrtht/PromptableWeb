@@ -28,6 +28,18 @@ export type PublicApiKeysUpdateSchema = z.infer<
 export type PublicApiKeysRelationshipsSchema = z.infer<
   typeof generated.publicApiKeysRelationshipsSchemaSchema
 >;
+export type PublicPipelineDraftsRowSchema = z.infer<
+  typeof generated.publicPipelineDraftsRowSchemaSchema
+>;
+export type PublicPipelineDraftsInsertSchema = z.infer<
+  typeof generated.publicPipelineDraftsInsertSchemaSchema
+>;
+export type PublicPipelineDraftsUpdateSchema = z.infer<
+  typeof generated.publicPipelineDraftsUpdateSchemaSchema
+>;
+export type PublicPipelineDraftsRelationshipsSchema = z.infer<
+  typeof generated.publicPipelineDraftsRelationshipsSchemaSchema
+>;
 export type PublicPipelineRunsRowSchema = z.infer<
   typeof generated.publicPipelineRunsRowSchemaSchema
 >;

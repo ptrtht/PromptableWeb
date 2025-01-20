@@ -1,11 +1,7 @@
 <script lang="ts">
   import type { NodeConfig } from '$lib/services/schemas/PipelineConfig';
-  import { Checkbox } from '../../checkbox';
-  import { Input } from '../../input';
   import { Label } from '../../label';
   import LlmModelSelect from '../../llm-model-select/LLMModelSelect.svelte';
-  import * as Select from '../../select';
-  import { Textarea } from '../../textarea';
 
   let { node }: { node: NodeConfig } = $props();
 </script>

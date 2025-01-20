@@ -36,9 +36,56 @@ export type Database = {
         }
         Relationships: []
       }
+      pipeline_drafts: {
+        Row: {
+          created_at: string
+          id: number
+          pipeline: Json
+          pipeline_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          pipeline: Json
+          pipeline_id: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          pipeline?: Json
+          pipeline_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_drafts_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "pipelines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pipeline_drafts_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "v_pipeline_stats_total"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pipeline_drafts_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "v_pipeline_stats_weekly"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pipeline_runs: {
         Row: {
           created_at: string
+          environment: string
           id: number
           input: Json | null
           log: Json
@@ -49,16 +96,18 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          environment?: string
           id?: number
           input?: Json | null
           log: Json
           pipeline_id: string
-          price: number
+          price?: number
           result: Database["public"]["Enums"]["pipeline_result"]
           version: number
         }
         Update: {
           created_at?: string
+          environment?: string
           id?: number
           input?: Json | null
           log?: Json

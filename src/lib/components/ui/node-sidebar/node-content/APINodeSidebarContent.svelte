@@ -10,6 +10,8 @@
   import ObjectInput from '../../object-input/ObjectInput.svelte';
   import Textarea from '../../textarea/textarea.svelte';
   import type { APINodeInput } from '$lib/services/schemas/nodes/APINode';
+  import { Button } from '../../button';
+  import { executeNode, getAllKeys, nodeExecutionsStore } from '$lib/stores/nodeExecutionsStore';
 
   let {
     currentlyActiveNode = $bindable(),
@@ -47,6 +49,15 @@
       toast.error('Pipeline not found');
       throw new Error('Pipeline not found');
     }
+
+    testRunOutput = $nodeExecutionsStore[currentlyActiveNode ?? ''] ?? {};
+  });
+
+  let testRunOutput: Record<string, any> = $state({});
+  let testRunOutputVariables: string[] = $state([]);
+
+  $effect(() => {
+    testRunOutputVariables = getAllKeys(testRunOutput);
   });
 </script>
 
@@ -176,5 +187,24 @@
         </div>
       {/if}
     </div>
+  {:else if selectedMenuItem === 'Output'}
+    <div class="flex flex-col gap-2">
+      <div>
+        <Label>Output</Label>
+        <Textarea value={JSON.stringify(testRunOutput, null, 2)} disabled />
+      </div>
+      <div>
+        <Label>Variables:</Label>
+        <Textarea value={testRunOutputVariables.join('\n')} disabled />
+      </div>
+    </div>
+    <Button
+      onclick={async () => {
+        const result = await executeNode(currentlyActiveNode);
+        testRunOutput = result?.output;
+      }}
+    >
+      Test
+    </Button>
   {/if}
 {/if}

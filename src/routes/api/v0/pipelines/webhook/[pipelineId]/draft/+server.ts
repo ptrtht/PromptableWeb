@@ -50,7 +50,12 @@ export const POST = (async ({ request, params, url }) => {
     const { initialState, untilNodeId } = executionParams.success ? rawBody : {};
 
     // Get pipeline configuration
+    const draftPipelineConfig = await PipelineServerStore.getPipelineDraft(pipelineId);
     const pipelineConfig = await PipelineServerStore.getPipeline(pipelineId);
+
+    pipelineConfig.pipeline = draftPipelineConfig.pipeline as any;
+    pipelineConfig.version = draftPipelineConfig.version;
+
     version = pipelineConfig.version;
 
     // Setup context with all resolvers

@@ -16,7 +16,7 @@
     >
       <defs>
         <pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse">
-          <rect width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" />
+          <rect class="text-foreground/10 opacity-75" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#grid)" />

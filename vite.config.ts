@@ -6,4 +6,7 @@ export default defineConfig({
   ssr: {
     noExternal: ['monaco-editor'],
   },
+  optimizeDeps: {
+    exclude: ["svelte-codemirror-editor", "codemirror", "@codemirror/language-javascript" /* ... */],
+},
 });

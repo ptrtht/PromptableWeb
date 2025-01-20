@@ -17,8 +17,10 @@
   import * as Card from '../card';
   import { slide } from 'svelte/transition';
 
+  const defaultMaxRows = 9999;
+
   const {
-    maxRows = 9999,
+    maxRows = defaultMaxRows,
   }: {
     maxRows?: number;
   } = $props();
@@ -48,14 +50,16 @@
       <H4>Your pipelines</H4>
       <div class="flex gap-3">
         <Button variant="default" href="pipelines/new">Create new</Button>
-        <Button
-          variant="outline"
-          onclick={() => {
-            goto('/pipelines');
-          }}
-        >
-          View all
-        </Button>
+        {#if maxRows !== defaultMaxRows}
+          <Button
+            variant="outline"
+            onclick={() => {
+              goto('/pipelines');
+            }}
+          >
+            View all
+          </Button>
+        {/if}
       </div>
     </div>
     <Table.Root>

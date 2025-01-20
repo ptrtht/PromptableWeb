@@ -1,22 +1,17 @@
 import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { generateText, type LanguageModel, Message } from 'ai';
 import { z } from 'zod';
 import { LoggingService } from './LoggingService';
-import type { LLMModel, LLMProvider } from '../schemas/nodes/LLMNode';
+import { LLMUsageSchema, type LLMModel, type LLMProvider } from '../schemas/nodes/LLMNode';
+import { LLMPricingStore } from '../stores/LLMPricingStore';
+import { createXai } from '@ai-sdk/xai';
 
 // usage is tokens used & cost of the API call
 // cost is awlays in USD cents
-const LLMUsageSchema = z.object({
-  prompt_tokens: z.number(),
-  prompt_tokens_cost: z.number(),
-  completion_tokens: z.number(),
-  completion_tokens_cost: z.number(),
-  total_tokens: z.number(),
-  total_cost: z.number(),
-});
 
 const LLMResponseSchema = z.object({
-  warnings: z.array(z.string()).optional(),
+  warnings: z.string().optional(),
   generation: z.string(),
   finishReason: z.enum(['stop', 'length', 'content-filter', 'tool-calls', 'error', 'other', 'unknown']).or(z.string()),
   usage: LLMUsageSchema,
@@ -52,10 +47,22 @@ export class LLMService {
       })(params.model);
     }
 
+    if (params.provider.toLowerCase().includes('anthropic')) {
+      aiProvider = createAnthropic({
+        apiKey: params.apiKey,
+      })(params.model);
+    }
+
+    if (params.provider.toLowerCase().includes('grok')) {
+      aiProvider = createXai({
+        apiKey: params.apiKey,
+      })(params.model);
+    }
+
     try {
       if (!aiProvider) throw new Error('Invalid provider: ' + params.provider);
 
-      LoggingService.log('info', 'Making OpenAI API call', {
+      LoggingService.log('info', 'Making LLM API call', {
         model: params.model,
         messagesCount: params.messages.length,
       });
@@ -72,30 +79,27 @@ export class LLMService {
         frequencyPenalty: params.frequency_penalty,
         stopSequences: params.stopSequences,
         maxRetries: 0,
-      },
-    
-    );
+      });
 
       LoggingService.debug('LLM API call response', { generation });
 
-      const cost = await this.getUsageCostForModel({
-        prompt_tokens: generation.usage.promptTokens,
-        completion_tokens: generation.usage.completionTokens,
+      const cost = await LLMPricingStore.getLLMPromptCost({
+        tokens_input: generation.usage.promptTokens,
+        tokens_output: generation.usage.completionTokens,
         model: params.model,
+        provider: params.provider,
       });
 
       const usage = LLMUsageSchema.parse({
         prompt_tokens: generation.usage.promptTokens,
-        prompt_tokens_cost: cost.prompt_tokens_cost,
         completion_tokens: generation.usage.completionTokens,
-        completion_tokens_cost: cost.completion_tokens_cost,
         total_tokens: generation.usage.promptTokens + generation.usage.completionTokens,
-        total_cost: cost.total_cost,
+        ...cost,
       });
 
       // Validate response format
       const response = LLMResponseSchema.parse({
-        warnings: generation.warnings,
+        warnings: JSON.stringify(generation.warnings),
         generation: generation.text,
         finishReason: generation.finishReason,
         usage,
@@ -118,25 +122,5 @@ export class LLMService {
       // Generic error handler
       throw new Error(`LLM API call failed: ${error.message}`);
     }
-  }
-
-  static async getUsageCostForModel({
-    prompt_tokens,
-    completion_tokens,
-    model,
-  }: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    model: LLMModel;
-  }) {
-    // OPENAI
-    const [provider, modelName] = model.split('/');
-
-    //! I'm tired lets just assume all cost is random between 0 and 1
-    return {
-      prompt_tokens_cost: Math.floor(Math.random() * 1),
-      completion_tokens_cost: Math.floor(Math.random() * 1),
-      total_cost: Math.floor(Math.random() * 1),
-    };
   }
 }

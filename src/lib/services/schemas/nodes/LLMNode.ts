@@ -11,6 +11,22 @@ export type Message = z.infer<typeof MessageSchema>;
 export const LLMProviderSchema = z.enum(['openai', 'anthropic', 'grok']);
 export type LLMProvider = z.infer<typeof LLMProviderSchema>;
 
+
+export const LLMPriceUsageSchema = z.object({
+  prompt_tokens_cost: z.number(),
+  completion_tokens_cost: z.number(),
+  total_cost: z.number(),
+})
+export type LLMPriceUsage = z.infer<typeof LLMPriceUsageSchema>;
+
+export const LLMUsageSchema = z.object({
+  prompt_tokens: z.number(),
+  completion_tokens: z.number(),
+  total_tokens: z.number(),
+}).and(LLMPriceUsageSchema);
+
+export type LLMUsage = z.infer<typeof LLMUsageSchema>;
+
 export const LLMModelSchema = z
   .string()
   .regex(

@@ -35,7 +35,7 @@
     card bg-background shadow-md
     border-l border-b border-3 border-muted
     w-full max-w-xl
-    p-6 flex flex-col gap-6 z-50
+    p-6 flex flex-col z-50
     max-h-[calc(100vh-4rem)]
     pb-20 overflow-y-auto
     "

@@ -1,23 +1,22 @@
+import { z } from 'zod';
 import type { VariableResolver } from './VariableResolver';
 
-export type NodeState = {
-  input: any;
-  output: any;
-  timestamp: number;
-  status: 'completed' | 'error';
-};
+
+export const NodeStateSchema = z.object({
+  input: z.any(),
+  output: z.any(),
+  timestamp: z.number(),
+  status: z.enum(['completed', 'error']),
+});
+
+export type NodeState = z.infer<typeof NodeStateSchema>;
 
 export class ExecutionContext {
-  private nodeState = new Map<string, {
-    input: any;
-    output: any;
-    timestamp: number;
-    status: 'completed' | 'error';
-  }>();
+  private nodeState = new Map<string, NodeState>();
   private resolvers = new Map<string, VariableResolver>();
 
   constructor(resolvers: VariableResolver[]) {
-    resolvers.forEach(resolver => {
+    resolvers.forEach((resolver) => {
       this.resolvers.set(resolver.namespace, resolver);
     });
   }
@@ -27,7 +26,7 @@ export class ExecutionContext {
       input,
       output,
       timestamp: Date.now(),
-      status
+      status,
     });
   }
 

@@ -25,7 +25,7 @@
 >
   <Sidebar.Trigger />
   <Divider direction="vertical" class="py-6" />
-  <dir class="flex-grow m-0 p-0 ml-1 flex place-content-between">
+  <dir class=" m-0 p-0 ml-1 flex place-content-between">
     <nav class={' flex items-center space-x-4 justify-end'}>
       <Breadcrumb.Root class="">
         <Breadcrumb.List>
@@ -42,10 +42,10 @@
         </Breadcrumb.List>
       </Breadcrumb.Root>
     </nav>
-    <div class="ml-auto flex items-center space-x-4">
-      {#if children}
-        {@render children()}
-      {/if}
-    </div>
   </dir>
+  <div class="ml-auto flex-grow flex items-center space-x-4">
+    {#if children}
+      {@render children()}
+    {/if}
+  </div>
 </div>

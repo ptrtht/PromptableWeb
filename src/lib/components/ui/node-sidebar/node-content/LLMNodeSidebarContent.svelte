@@ -7,11 +7,13 @@
   import { Input } from '../../input';
   import LlmModelSelect from '../../llm-model-select/LLMModelSelect.svelte';
   import { Checkbox } from '../../checkbox';
-  import Paragraph from '../../text/Paragraph.svelte';
   import { Textarea } from '../../textarea';
   import { Slider } from '../../slider';
   import * as Select from '../../select';
   import { Button } from '../../button';
+  import { executeNode, getAllKeys, nodeExecutionsStore } from '$lib/stores/nodeExecutionsStore';
+  import { onMount } from 'svelte';
+  import CodemirrorInput from '../../codemirror-input/CodemirrorInput.svelte';
 
   let {
     currentlyActiveNode = $bindable(),
@@ -22,6 +24,10 @@
   let selectedMenuItem: 'Build' | 'Output' = $state('Build');
 
   let customModel: boolean = $state(false);
+
+  onMount(() => {
+    testRunOutput = $nodeExecutionsStore[currentlyActiveNode ?? ''] ?? {};
+  });
 
   const addMessage = () => {
     if (!currentlyActiveNode || $pipelineEditingStore?.pipeline.nodes[currentlyActiveNode].type != 'llm') return;
@@ -35,6 +41,14 @@
     if (!currentlyActiveNode || $pipelineEditingStore?.pipeline.nodes[currentlyActiveNode].type != 'llm') return;
     $pipelineEditingStore?.pipeline.nodes[currentlyActiveNode].config.messages.splice(index, 1);
   };
+
+  let testRunOutput: Record<string, any> = $state({});
+
+  let testRunOutputVariables: string[] = $state([]);
+
+  $effect(() => {
+    testRunOutputVariables = getAllKeys(testRunOutput);
+  });
 </script>
 
 {#if currentlyActiveNode && $pipelineEditingStore?.pipeline.nodes[currentlyActiveNode]?.type === 'llm'}
@@ -62,7 +76,7 @@
       }}
     >
       <Play size="1rem" />
-      <span> Run </span>
+      <span> Test </span>
     </button>
   </div>
   {#if $pipelineEditingStore.pipeline.nodes[currentlyActiveNode].type === 'llm'}
@@ -90,6 +104,7 @@
 
         <div class="flex flex-col gap-2">
           <Label>System Prompt</Label>
+          <CodemirrorInput />
           <Textarea bind:value={$pipelineEditingStore.pipeline.nodes[currentlyActiveNode].config.system} />
         </div>
 
@@ -218,6 +233,25 @@
       stop_sequences: z.array(z.string()).optional(),
        ? -->
       </div>
+    {:else if selectedMenuItem === 'Output'}
+      <div class="flex flex-col gap-2">
+        <div>
+          <Label>Output</Label>
+          <Textarea value={JSON.stringify(testRunOutput, null, 2)} disabled />
+        </div>
+        <div>
+          <Label>Variables:</Label>
+          <Textarea value={testRunOutputVariables.join('\n')} disabled />
+        </div>
+      </div>
+      <Button
+        onclick={async () => {
+          const result = await executeNode(currentlyActiveNode);
+          testRunOutput = result?.output;
+        }}
+      >
+        Test
+      </Button>
     {/if}
   {/if}
 {/if}

@@ -25,16 +25,20 @@
     <Label>URL</Label>
     <Input class="rounded-xl" value={node.config.url} disabled />
   </div>
-  <div>
-    <Label>Headers</Label>
-    {#if node.config.headers && Object.keys(node.config.headers).length > 0}
-      <ObjectInput object={node.config.headers} disabled maxrows={2} />
-    {/if}
-  </div>
-  <div>
-    <Label>Query parameters</Label>
-    {#if node.config.queryParams && Object.keys(node.config.queryParams).length > 0}
-      <ObjectInput object={node.config.queryParams} disabled maxrows={2} />
-    {/if}
-  </div>
+  {#if node.config.headers}
+    <div>
+      <Label>Headers</Label>
+      {#if Object.keys(node.config.headers).length > 0}
+        <ObjectInput object={node.config.headers} disabled maxrows={2} />
+      {/if}
+    </div>
+  {/if}
+  {#if node.config.queryParams}
+    <div>
+      <Label>Query parameters</Label>
+      {#if Object.keys(node.config.queryParams).length > 0}
+        <ObjectInput object={node.config.queryParams} disabled maxrows={2} />
+      {/if}
+    </div>
+  {/if}
 {/if}

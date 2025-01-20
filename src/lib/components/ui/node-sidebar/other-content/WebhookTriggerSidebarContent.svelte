@@ -5,11 +5,10 @@
   import H4 from '../../text/H4.svelte';
   import Paragraph from '../../text/Paragraph.svelte';
   import { AspectRatio } from '../../aspect-ratio';
-  import { Code, Copy, SquareSlash, Webhook } from 'lucide-svelte';
+  import { Code, Copy, Hammer, Play, SquareSlash, Webhook } from 'lucide-svelte';
   import { pipelineEditingStore } from '$lib/stores/pipelineEditingStore';
   import { Input } from '../../input';
   import { Button } from '../../button';
-  import CodeInput from '../../code-input/CodeInput.svelte';
   import { toast } from 'svelte-sonner';
   import ObjectInput from '../../object-input/ObjectInput.svelte';
   import * as Select from '$lib/components/ui/select/index.js';
@@ -18,6 +17,8 @@
   import { onMount } from 'svelte';
   import { ApiKeyStore } from '$lib/services/stores/ApiKeyStore';
   import { browser } from '$app/environment';
+  import { Textarea } from '../../textarea';
+  import { nodeWebhookTriggerInputStore } from '$lib/stores/nodeExecutionsStore';
 
   let selectedMenuItem: 'Curl' | 'Promptable SDK' = $state('Curl');
   let selectedKeyId: string | undefined = $state();
@@ -25,6 +26,8 @@
 
   onMount(async () => {
     apiKeys = await ApiKeyStore.getKeys();
+
+    rawPayload = JSON.stringify($nodeWebhookTriggerInputStore, null, 2);
   });
 
   //   current tld / api/v0/pipelines/webook/:id
@@ -36,114 +39,160 @@
     navigator.clipboard.writeText(webhookUrl);
     toast.success('URL copied to clipboard');
   };
+
+  let selectedMenuItem2: 'Build' | 'Output' = $state('Build');
+
+  let rawPayload = $state('');
+
+  const handleRawPayloadBlur = () => {
+    if (rawPayload) {
+      // wiht a 1 sec throttle
+
+      try {
+        const j = JSON.parse(rawPayload);
+        nodeWebhookTriggerInputStore.set(j);
+        toast.success('Payload set');
+      } catch (e) {
+        toast.error('Invalid JSON payload');
+      }
+    }
+  };
 </script>
 
 {#if $pipelineEditingStore}
-  <div class="flex flex-col gap-4">
-    <div class="text-left">
-      <H4>Webhook Trigger</H4>
-    </div>
+  <div class="flex rounded-xl gap-2 border border-muted">
+    <button
+      class={cn(
+        'flex flex-grow items-center justify-center p-2 rounded-xl cursor-pointer gap-2',
+        selectedMenuItem2 == 'Build' ? 'bg-accent' : ''
+      )}
+      onclick={() => {
+        selectedMenuItem2 = 'Build';
+      }}
+    >
+      <Hammer size="1rem" />
+      <span> Build </span>
+    </button>
 
-    <Paragraph variant="muted">
-      A webhook trigger is a URL that you can use to trigger a pipeline from an external service
-    </Paragraph>
-
-    <div class="flex flex-col gap-1">
-      <Label>
-        <Paragraph>Node name</Paragraph>
-      </Label>
-      <Input bind:value={$pipelineEditingStore.pipeline.input.name} placeholder="Pipeline trigger" />
-    </div>
-
-    <div class="flex flex-col gap-1">
-      <Label>
-        <Paragraph>Api key</Paragraph>
-      </Label>
-      <Select.Root type="single" bind:value={selectedKeyId}>
-        <Select.Trigger>
-          {apiKeys.find((key) => key.id === Number(selectedKeyId))?.name ?? 'Select an API key'}
-        </Select.Trigger>
-        <Select.Content>
-          <!-- <Select.Item value="light">Light</Select.Item> -->
-          {#each apiKeys as key}
-            <Select.Item value={String(key.id)}>{key.name}</Select.Item>
-          {/each}
-        </Select.Content>
-      </Select.Root>
-      <p class="text-muted-foreground">This is only for the examples below.</p>
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <Checkbox bind:checked={$pipelineEditingStore.pipeline.input.validate} aria-labelledby="terms-label" />
-        <Label>
-          <Paragraph>Input validation</Paragraph>
-        </Label>
-      </div>
-      <Paragraph variant="muted">Validate incoming requests based on a schema</Paragraph>
-    </div>
-
-    {#if $pipelineEditingStore.pipeline.input.validate}
-      <div class="flex flex-col gap-2" transition:slide>
-        <Label>
-          <Paragraph>Input Body Schema</Paragraph>
-        </Label>
-        <Paragraph variant="muted">
-          Define the schema for the incoming request body. This will be used to validate the incoming request
-        </Paragraph>
-        <div class="grid gap-2">
-          <ObjectInput
-            bind:object={$pipelineEditingStore.pipeline.input.schema}
-            select={[
-              { value: 'string', label: 'String' },
-              { value: 'number', label: 'Number' },
-              { value: 'boolean', label: 'Boolean' },
-              { value: 'object', label: 'Object' },
-              { value: 'array', label: 'Array' },
-            ]}
-          />
-        </div>
-      </div>
-    {/if}
-
-    <div class="flex rounded-xl gap-2 border border-muted">
-      <button
-        class={cn(
-          'flex flex-grow items-center justify-center p-2 rounded-xl cursor-pointer gap-2',
-          selectedMenuItem == 'Curl' ? 'bg-accent' : ''
-        )}
-        onclick={() => {
-          selectedMenuItem = 'Curl';
-        }}
-      >
-        <SquareSlash size="1rem" />
-        <span> Curl </span>
-      </button>
-
-      <button
-        class={cn(
-          'flex flex-grow items-center justify-center p-2 rounded-xl cursor-pointer gap-2',
-          selectedMenuItem == 'Promptable SDK' ? 'bg-accent' : ''
-        )}
-        onclick={() => {
-          selectedMenuItem = 'Promptable SDK';
-        }}
-      >
-        <Code size="1rem" />
-        <span> Promptable SDK </span>
-      </button>
-    </div>
-
+    <button
+      class={cn(
+        'flex flex-grow items-center justify-center p-2 rounded-xl cursor-pointer gap-2',
+        selectedMenuItem2 == 'Output' ? 'bg-accent' : ''
+      )}
+      onclick={() => {
+        selectedMenuItem2 = 'Output';
+      }}
+    >
+      <Play size="1rem" />
+      <span> Test </span>
+    </button>
+  </div>
+  {#if selectedMenuItem2 === 'Build'}
     <div class="flex flex-col gap-4">
-      {#if selectedMenuItem === 'Curl'}
-        <div class="flex flex-col gap-2">
+      <div class="text-left">
+        <H4>Webhook Trigger</H4>
+      </div>
+
+      <Paragraph variant="muted">
+        A webhook trigger is a URL that you can use to trigger a pipeline from an external service
+      </Paragraph>
+
+      <div class="flex flex-col gap-1">
+        <Label>
+          <Paragraph>Node name</Paragraph>
+        </Label>
+        <Input bind:value={$pipelineEditingStore.pipeline.input.name} placeholder="Pipeline trigger" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <Label>
+          <Paragraph>Api key</Paragraph>
+        </Label>
+        <Select.Root type="single" bind:value={selectedKeyId}>
+          <Select.Trigger>
+            {apiKeys.find((key) => key.id === Number(selectedKeyId))?.name ?? 'Select an API key'}
+          </Select.Trigger>
+          <Select.Content>
+            <!-- <Select.Item value="light">Light</Select.Item> -->
+            {#each apiKeys as key}
+              <Select.Item value={String(key.id)}>{key.name}</Select.Item>
+            {/each}
+          </Select.Content>
+        </Select.Root>
+        <p class="text-muted-foreground">This is only for the examples below.</p>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <Checkbox bind:checked={$pipelineEditingStore.pipeline.input.validate} aria-labelledby="terms-label" />
           <Label>
-            <Paragraph>Webhook URL</Paragraph>
+            <Paragraph>Input validation</Paragraph>
           </Label>
-          <div class="flex-grow h-content">
-            <CodeInput
-              disabled
-              value={`curl -X POST ${webhookUrl} \\
+        </div>
+        <Paragraph variant="muted">Validate incoming requests based on a schema</Paragraph>
+      </div>
+
+      {#if $pipelineEditingStore.pipeline.input.validate}
+        <div class="flex flex-col gap-2" transition:slide>
+          <Label>
+            <Paragraph>Input Body Schema</Paragraph>
+          </Label>
+          <Paragraph variant="muted">
+            Define the schema for the incoming request body. This will be used to validate the incoming request
+          </Paragraph>
+          <div class="grid gap-2">
+            <ObjectInput
+              bind:object={$pipelineEditingStore.pipeline.input.schema}
+              select={[
+                { value: 'string', label: 'String' },
+                { value: 'number', label: 'Number' },
+                { value: 'boolean', label: 'Boolean' },
+                { value: 'object', label: 'Object' },
+                { value: 'array', label: 'Array' },
+              ]}
+            />
+          </div>
+        </div>
+      {/if}
+
+      <div class="flex rounded-xl gap-2 border border-muted">
+        <button
+          class={cn(
+            'flex flex-grow items-center justify-center p-2 rounded-xl cursor-pointer gap-2',
+            selectedMenuItem == 'Curl' ? 'bg-accent' : ''
+          )}
+          onclick={() => {
+            selectedMenuItem = 'Curl';
+          }}
+        >
+          <SquareSlash size="1rem" />
+          <span> Curl </span>
+        </button>
+
+        <button
+          class={cn(
+            'flex flex-grow items-center justify-center p-2 rounded-xl cursor-pointer gap-2',
+            selectedMenuItem == 'Promptable SDK' ? 'bg-accent' : ''
+          )}
+          onclick={() => {
+            selectedMenuItem = 'Promptable SDK';
+          }}
+        >
+          <Code size="1rem" />
+          <span> Promptable SDK </span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        {#if selectedMenuItem === 'Curl'}
+          <div class="flex flex-col gap-2">
+            <Label>
+              <Paragraph>Webhook URL</Paragraph>
+            </Label>
+            <div class="flex-grow h-content">
+              <!-- <CodeInput
+                disabled
+                value={`curl -X POST ${webhookUrl} \\
     -H "Content-Type: application/json" \\
     -H "x-api-key: ${apiKeys.find((key) => key.id === Number(selectedKeyId))?.key ?? '<API-KEY>'}" \\
     -d '
@@ -157,19 +206,19 @@ ${JSON.stringify(
   .map((line) => '      ' + line)
   .join('\n')}
     '`}
-            />
+              /> -->
+            </div>
           </div>
-        </div>
-      {/if}
+        {/if}
 
-      {#if selectedMenuItem === 'Promptable SDK'}
-        <Label>
-          <Paragraph>Promptable SDK</Paragraph>
-        </Label>
-        <div class="flex-grow h-content">
-          <CodeInput
-            disabled
-            value={`const promptable = new Promptable('<API_KEY>')
+        {#if selectedMenuItem === 'Promptable SDK'}
+          <Label>
+            <Paragraph>Promptable SDK</Paragraph>
+          </Label>
+          <div class="flex-grow h-content">
+            <CodeInput
+              disabled
+              value={`const promptable = new Promptable('<API_KEY>')
 
 const response = await promptable.pipeline(
     '${$pipelineEditingStore.id}',
@@ -184,9 +233,23 @@ ${JSON.stringify(
   .join('\n')}
     )
 `}
-          />
-        </div>
-      {/if}
+            />
+          </div>
+        {/if}
+      </div>
     </div>
-  </div>
+  {:else if selectedMenuItem2 === 'Output'}
+    <div class="flex flex-col gap-4">
+      <div class="text-left">
+        <H4>Test webhook</H4>
+      </div>
+
+      <Paragraph variant="muted">
+        Paste a sample payload to enable suggestions in the node configuration. The payload structure will be used for
+        autocompletion when referencing input values.
+      </Paragraph>
+
+      <Textarea placeholder="Paste your json payload here..." bind:value={rawPayload} onblur={handleRawPayloadBlur} />
+    </div>
+  {/if}
 {/if}

@@ -4,7 +4,7 @@
   import { toast } from 'svelte-sonner';
   import Paragraph from '../text/Paragraph.svelte';
   import BaseNodeView from './BaseNodeView.svelte';
-  import { Edit, Ellipsis, Trash, Webhook, Zap } from 'lucide-svelte';
+  import { Brain, Edit, Ellipsis, Trash, Webhook, Zap } from 'lucide-svelte';
   import { Badge } from '../badge';
   import { Button } from '../button';
   import * as Popover from '../popover';
@@ -49,6 +49,8 @@
       <div class="flex items-center gap-2">
         {#if node?.type === 'api_call'}
           <Webhook size="1.2rem" />
+        {:else if node?.type === 'llm'}
+          <Brain />
         {:else}
           <Zap fill="currentColor" size="1rem" />
         {/if}

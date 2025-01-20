@@ -4,76 +4,83 @@ import { PipelineStore } from '$lib/services/stores/PipelineStore';
 import throttle from 'lodash/throttle';
 import { writable } from 'svelte/store';
 
-export const pipelineEditingStore = writable<{ id: string; pipeline: PipelineConfigJson } | null>(null);
+export type PipelineEditingStoreType = { id: string; pipeline: PipelineConfigJson; version: number } | null;
+
+export const pipelineEditingStore = writable<PipelineEditingStoreType>(null);
+
+
+export const updateCount = writable<number>(0);
 
 // on update, save to db.
 pipelineEditingStore.subscribe((value) => {
   if (!value) return;
+  updateCount.update((n) => n + 1);
   LoggingService.debug('Pipeline store update triggered');
 
-  //? make the vars "safe" -> instead of null values for optional fields, we want to remove them
-  // Input
-  if (value.pipeline.input.name === null || value.pipeline.input.name === undefined)
-    delete value.pipeline.input.name;
-
-  // nodes
-  Object.entries(value.pipeline.nodes).forEach(([key, node]) => {
-    // for text values, if empty, remove them
-    if (!node.name) delete node.name;
-
-    // nodes -> LLMNode
-    if (node.type === 'llm') {
-      // for number values we have to check explicitly
-      if (node.config.frequency_penalty === null || node.config.frequency_penalty === undefined)
-        delete node.config.frequency_penalty;
-
-      if (node.config.max_tokens === null || node.config.max_tokens === undefined) delete node.config.max_tokens;
-
-      if (node.config.presence_penalty === null || node.config.presence_penalty === undefined)
-        delete node.config.presence_penalty;
-
-      // for arrays we have to check if they are empty
-      if (
-        node.config.stop_sequences === null ||
-        node.config.stop_sequences === undefined ||
-        node.config.stop_sequences.length === 0
-      )
-        delete node.config.stop_sequences;
-
-      if (!node.config.system) delete node.config.system;
-
-      if (node.config.temperature === null || node.config.temperature === undefined) delete node.config.temperature;
-
-      if (node.config.top_k === null || node.config.top_k === undefined) delete node.config.top_k;
-
-      if (node.config.top_p === null || node.config.top_p === undefined) delete node.config.top_p;
-    }
-
-    // nodes -> apiNode
-    if (node.type === 'api_call') {
-      if (!node.config.body) delete node.config.body;
-      if (!node.config.formData) delete node.config.formData;
-      if (!node.config.formUrlEncoded) delete node.config.formUrlEncoded;
-      if (!node.config.headers) delete node.config.headers;
-      if (!node.config.queryParams) delete node.config.queryParams;
-    }
-  });
+  value.pipeline = PipelineStore.purgePipeline(value.pipeline);
 
   // reassign the pipeline
   // pipelineEditingStore.set(value);
 
-  throttledSave(value.id, value.pipeline);
+  throttledFn(value);
 });
 
-const throttledSave = throttle(
-  async (id: string, pipeline: PipelineConfigJson) => {
+const throttledFn = throttle(
+  async (value: PipelineEditingStoreType) => {
+    if (!value) return;
+
+    // // add to commands
+    // slashCommandsStore.update((commands) => {
+    //   // start blank:
+    //   commands = [];
+
+    //   // each node should be a command, to get the node ID.
+    //   // if the command already exists, update it
+
+    //   // each property of the nodes should be a command as well in the form of "nodeId.property"
+    //   // the commands should be in order of the nodes in the pipeline
+
+    //   // get the node IDs
+    //   const nodeIds = value.pipeline.executionOrder;
+
+    //   // add the node commands
+    //   nodeIds.forEach((nodeId) => {
+    //     const node = value.pipeline.nodes[nodeId];
+    //     const command = {
+    //       id: nodeId,
+    //       label: node.name || 'Unnamed Node',
+    //       icon: node.type === 'api_call' ? '⚡️' : '🔗',
+    //       value: nodeId,
+    //     };
+
+    //     // add the node command
+    //     commands.push(command);
+
+    //     // add the property commands
+    //     if (node.type === 'api_call')
+    //       Object.keys(node.config).forEach((property) => {
+    //         const propertyCommand = {
+    //           id: `${nodeId}.${property}`,
+    //           label: `${node.name || 'Unnamed Node' + '.' + property}`,
+    //           icon: '🔧',
+    //           value: `${nodeId}.${property}`,
+    //         };
+
+    //         // add the property command
+    //         commands.push(propertyCommand);
+    //       });
+    //   });
+
+    //   return commands;
+    // });
+
     LoggingService.debug('Saving pipeline', {
-      id,
-      pipeline,
+      id: value.id,
+      pipeline: value.pipeline,
     });
-    await PipelineStore.updatePipelineJson(id, pipeline);
+    await PipelineStore.updatePipelineDraftJson(value.id, value.pipeline);
     LoggingService.debug('Pipeline saved');
   },
-  1000,
+  2500,
   { leading: true, trailing: true }
 );
